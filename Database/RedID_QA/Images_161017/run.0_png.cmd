@@ -1,0 +1,1 @@
+./build/bracelet_decoder -i /Users/shahargino/Documents/ImageProcessing/Bracelet_decoder/Database/RedID_QA/Images_161017/0.png --ROI="(330,500,600)" --MaxPixelWidth=50 --MaxPixelHeight=50 --MaxAspectRatio=4 --MinPixelArea=200 --MaxPixelArea=800 --imgEnhancementEn

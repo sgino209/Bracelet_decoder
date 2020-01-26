@@ -1,0 +1,12 @@
+ The algo performs a valid decoding if the following conditions are met:
+
+    1. Input image resolution shall be around 1600x1200
+    2. Marks are in focus and not blurred
+    3. Marks are the bracelet front
+    4. Marks are in an "optimal" lightening, e.g. no shadowed areas
+
+Notes:
+(-) Assumption 1 shall be assured by the algo (auto-resize) --> next release
+(-) Assumptions 2-3 are legitimate for a barcode-scanner app
+(-) Assumption 4 shall be eliminated by enhancing the algo --> next release
+
