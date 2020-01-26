@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 # (c) Shahar Gino, July-2017, sgino209@gmail.com
 
 from numpy import sqrt
@@ -74,16 +74,16 @@ def debug(message, debugMode):
     """ Auxiliary function for a conditional debug printout """
 
     if debugMode:
-        print "DEBUG: %s" % message
+        print("DEBUG: %s" % message)
 
 # ---------------------------------------------------------------------------------------------------------------
 def info(message):
     """ Auxiliary function for a info printout """
 
-    print "INFO: %s" % message
+    print("INFO: %s" % message)
 
 # ---------------------------------------------------------------------------------------------------------------
 def error(message):
     """ Auxiliary function for a error printout """
 
-    print "\033[1;31mERROR\033[0m: %s" % message
+    print("\033[1;31mERROR\033[0m: %s" % message)

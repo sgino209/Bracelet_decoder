@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 
 # proprietry
+.idea/
+.DS_Store
 Doc/PoC_demo.mov

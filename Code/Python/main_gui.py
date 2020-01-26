@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 # (c) Shahar Gino, July-2017, sgino209@gmail.com
 
 import wx
@@ -26,7 +26,7 @@ class main_gui_frame(wx.Frame):
                           pos=wx.DefaultPosition, size=wx.Size(PANEL_SIZE[0], PANEL_SIZE[1]),
                           style=(wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL) & ~wx.MAXIMIZE_BOX ^ wx.RESIZE_BORDER)
 
-        self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
+        self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
 
         # -----------------------------------------------------------------------------------------------------
         # Main Sizer, Top side: Image Browser + Go button:
@@ -37,7 +37,7 @@ class main_gui_frame(wx.Frame):
 
         self.m_filePicker1 = wx.FilePickerCtrl(self, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*",
                                                wx.DefaultPosition, (IMAGE_SIZE[0],-1), wx.FLP_DEFAULT_STYLE)
-        self.m_filePicker1.SetToolTipString(u"Choose input image file")
+        self.m_filePicker1.SetToolTip(u"Choose input image file")
         self.m_filePicker1.Bind(wx.EVT_FILEPICKER_CHANGED, self.OnSaveLogCheckBox)
         self.gSizer31.Add(self.m_filePicker1, 0, wx.ALL, 5)
 
@@ -122,25 +122,25 @@ class main_gui_frame(wx.Frame):
 
         in_frame = self.m_filePicker1.GetPath()
         if in_frame != "":
-            cmd = ["-i", self.m_filePicker1.GetPath().encode("utf-8"),
-                   "--PreprocessGaussKernel", self.m_textCtrl[0].GetValue().encode("utf-8"),
-                   "--PreprocessThreshBlockSize", self.m_textCtrl[1].GetValue().encode("utf-8"),
-                   "--PreprocessThreshweight", self.m_textCtrl[2].GetValue().encode("utf-8"),
-                   "--PreprocessMorphKernel", self.m_textCtrl[3].GetValue().encode("utf-8"),
-                   "--ROI", self.m_textCtrl[4].GetValue().encode("utf-8"),
-                   "--MinPixelWidth", self.m_textCtrl[5].GetValue().encode("utf-8"),
-                   "--MaxPixelWidth", self.m_textCtrl[6].GetValue().encode("utf-8"),
-                   "--MinPixelHeight", self.m_textCtrl[7].GetValue().encode("utf-8"),
-                   "--MaxPixelHeight", self.m_textCtrl[8].GetValue().encode("utf-8"),
-                   "--MinAspectRatio", self.m_textCtrl[9].GetValue().encode("utf-8"),
-                   "--MaxAspectRatio", self.m_textCtrl[10].GetValue().encode("utf-8"),
-                   "--MinPixelArea", self.m_textCtrl[11].GetValue().encode("utf-8"),
-                   "--MaxPixelArea", self.m_textCtrl[12].GetValue().encode("utf-8"),
-                   "--MinExtent", self.m_textCtrl[13].GetValue().encode("utf-8"),
-                   "--MaxExtent", self.m_textCtrl[14].GetValue().encode("utf-8"),
-                   "--MaxDrift", self.m_textCtrl[15].GetValue().encode("utf-8"),
-                   "--MarksRows", self.m_textCtrl[16].GetValue().encode("utf-8"),
-                   "--MarksCols", self.m_textCtrl[17].GetValue().encode("utf-8")]
+            cmd = ["-i", self.m_filePicker1.GetPath(),
+                   "--PreprocessGaussKernel", self.m_textCtrl[0].GetValue(),
+                   "--PreprocessThreshBlockSize", self.m_textCtrl[1].GetValue(),
+                   "--PreprocessThreshweight", self.m_textCtrl[2].GetValue(),
+                   "--PreprocessMorphKernel", self.m_textCtrl[3].GetValue(),
+                   "--ROI", self.m_textCtrl[4].GetValue(),
+                   "--MinPixelWidth", self.m_textCtrl[5].GetValue(),
+                   "--MaxPixelWidth", self.m_textCtrl[6].GetValue(),
+                   "--MinPixelHeight", self.m_textCtrl[7].GetValue(),
+                   "--MaxPixelHeight", self.m_textCtrl[8].GetValue(),
+                   "--MinAspectRatio", self.m_textCtrl[9].GetValue(),
+                   "--MaxAspectRatio", self.m_textCtrl[10].GetValue(),
+                   "--MinPixelArea", self.m_textCtrl[11].GetValue(),
+                   "--MaxPixelArea", self.m_textCtrl[12].GetValue(),
+                   "--MinExtent", self.m_textCtrl[13].GetValue(),
+                   "--MaxExtent", self.m_textCtrl[14].GetValue(),
+                   "--MaxDrift", self.m_textCtrl[15].GetValue(),
+                   "--MarksRows", self.m_textCtrl[16].GetValue(),
+                   "--MarksCols", self.m_textCtrl[17].GetValue()]
 
             if self.m_textCtrl[18].GetValue() == "True":
                 cmd.append("--imgEnhancementEn")
@@ -156,7 +156,7 @@ class main_gui_frame(wx.Frame):
     def OnRoiText(self, RoiInfo):
         """ ROI text control handler, called when text is updated """
 
-        frame = imread(self.m_filePicker1.GetPath().encode("utf-8"))
+        frame = imread(self.m_filePicker1.GetPath())
         h, w = frame.shape[:2]
         self.update_image(frame)
         self.draw_roi(w,h)
@@ -168,7 +168,7 @@ class main_gui_frame(wx.Frame):
         frame_cvt = cvtColor(in_frame, COLOR_RGB2BGR)
         frameResized = resize(frame_cvt, (IMAGE_SIZE[0], IMAGE_SIZE[1]))
         w, h = frameResized.shape[:2]
-        self.m_bitmap1.SetBitmap(wx.BitmapFromBuffer(w, h, frameResized))
+        self.m_bitmap1.SetBitmap(wx.Bitmap.FromBuffer(w, h, frameResized))
 
     # -----------------------------------------------------------------------------------------------------
     def add_attribute(self, name, defval, tooltip):
@@ -176,12 +176,12 @@ class main_gui_frame(wx.Frame):
 
         m_staticText = wx.StaticText(self, wx.ID_ANY, name, wx.DefaultPosition, wx.DefaultSize, 0)
         m_staticText.Wrap(-1)
-        m_staticText.SetToolTipString(tooltip)
+        m_staticText.SetToolTip(tooltip)
         self.gSizer3.Add(m_staticText, 0, wx.ALL, 5)
 
         m_textCtrl = wx.TextCtrl(self, id=wx.ID_ANY, name=wx.EmptyString, pos=wx.DefaultPosition, size=(200,-1), style=wx.TE_PROCESS_ENTER)
         m_textCtrl.SetLabel(defval)
-        m_textCtrl.SetToolTipString(tooltip)
+        m_textCtrl.SetToolTip(tooltip)
         self.m_textCtrl.append(m_textCtrl)
         self.gSizer3.Add(m_textCtrl, 0, wx.ALL, 5)
 
@@ -191,11 +191,11 @@ class main_gui_frame(wx.Frame):
 
         m_staticText = wx.StaticText(self, wx.ID_ANY, name, wx.DefaultPosition, wx.DefaultSize, 0)
         m_staticText.Wrap(-1)
-        m_staticText.SetToolTipString(tooltip)
+        m_staticText.SetToolTip(tooltip)
         self.gSizer3.Add(m_staticText, 0, wx.ALL, 5)
 
         m_comboBox = wx.ComboBox(self, wx.ID_ANY, defval, wx.DefaultPosition, (200,-1), combovals, 0)
-        m_comboBox.SetToolTipString(tooltip)
+        m_comboBox.SetToolTip(tooltip)
         self.m_textCtrl.append(m_comboBox)
         self.gSizer3.Add(m_comboBox, 0, wx.ALL, 5)
 
@@ -204,11 +204,11 @@ class main_gui_frame(wx.Frame):
         """ Auxiliary method for drawing ROI on the displayed image """
 
         bitmap = self.m_bitmap1.GetBitmap()
-        image = wx.ImageFromBitmap(bitmap)
+        image = bitmap.ConvertToImage()
         buf = image.GetDataBuffer()
         frame = frombuffer(buf, dtype='uint8')
         frame = frame.reshape((IMAGE_SIZE[0],IMAGE_SIZE[1],3))
-        roi = literal_eval(self.m_textCtrl[4].GetValue().encode("utf-8"))
+        roi = eval(self.m_textCtrl[4].GetValue().encode("utf-8"))
 
         roi_scaled = []
         if len(roi) > 2:
@@ -220,7 +220,7 @@ class main_gui_frame(wx.Frame):
 
         draw_roi_aux(frame, roi_scaled)
 
-        self.m_bitmap1.SetBitmap(wx.BitmapFromBuffer(IMAGE_SIZE[0], IMAGE_SIZE[1], frame))
+        self.m_bitmap1.SetBitmap(wx.Bitmap.FromBuffer(IMAGE_SIZE[0], IMAGE_SIZE[1], frame))
 
     # -----------------------------------------------------------------------------------------------------
     def __del__(self):

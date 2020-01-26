@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 # (c) Shahar Gino, July-2017, sgino209@gmail.com
 
 from sys import argv
@@ -17,20 +17,20 @@ __version__ = "1.2"
 # ---------------------------------------------------------------------------------------------------------------
 def usage():
     script_name = path.basename(__file__)
-    print ''
-    print '%s -i [image_file]' % script_name
-    print ''
-    print 'Optional preprocssing flags:                  --PreprocessGaussKernel --PreprocessThreshBlockSize --PreprocessThreshweight --PreprocessMorphKernel --imgEnhancementEn'
-    print 'Optional marks-detection flags:               --MinPixelWidth --MaxPixelWidth --MinPixelHeight --MaxPixelHeight --MinAspectRatio --MaxAspectRatio'
-    print 'Optional marks-detection flags (cont.):       --MinPixelArea --MaxPixelArea --MaxDrift --MarksRows --MarksCols --ROI --perspectiveMode'
-    print 'Optional misc. flags:                         --debug --version'
-    print ''
-    print 'Note about ROI settings:'
-    print '   (-) Option 1:  ROI = (startX, startY, width, height)'
-    print '   (-) Option 2:  ROI = (startX, startY, R)  --->  width=height=R'
-    print '   (-) Option 3:  ROI = (0,0) --->  ROI equals to whole input image'
-    print 'Note that input image is automatically being resized for 1600x1200, so ROI shall be set accordingly'
-    print ''
+    print('')
+    print('%s -i [image_file]' % script_name)
+    print('')
+    print('Optional preprocssing flags:                  --PreprocessGaussKernel --PreprocessThreshBlockSize --PreprocessThreshweight --PreprocessMorphKernel --imgEnhancementEn')
+    print('Optional marks-detection flags:               --MinPixelWidth --MaxPixelWidth --MinPixelHeight --MaxPixelHeight --MinAspectRatio --MaxAspectRatio')
+    print('Optional marks-detection flags (cont.):       --MinPixelArea --MaxPixelArea --MaxDrift --MarksRows --MarksCols --ROI --perspectiveMode')
+    print('Optional misc. flags:                         --debug --version')
+    print('')
+    print('Note about ROI settings:')
+    print('   (-) Option 1:  ROI = (startX, startY, width, height)')
+    print('   (-) Option 2:  ROI = (startX, startY, R)  --->  width=height=R')
+    print('   (-) Option 3:  ROI = (0,0) --->  ROI equals to whole input image')
+    print('Note that input image is automatically being resized for 1600x1200, so ROI shall be set accordingly')
+    print('')
 
 # ---------------------------------------------------------------------------------------------------------------
 def main(_argv):
@@ -126,7 +126,7 @@ def main(_argv):
                 info("BraceletDecoder version: %s" % __version__)
                 exit()
 
-    except GetoptError, e:
+    except GetoptError as e:
         error(str(e))
         usage()
         exit(2)

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 # (c) Shahar Gino, July-2017, sgino209@gmail.com
 
 from numpy import zeros, uint8, array, sort
@@ -29,8 +29,8 @@ def decode_marks(marks_list, MarksRows, MarksCols, frame_shape, rotation_angle_d
     radius_y = (max_y - min_y) / (MarksRows - 1)
     radius_x = (max_x - min_x) / (MarksCols - 1)
 
-    y_scale = range(min_y, max_y, radius_y)
-    x_scale = range(min_x, max_x, radius_x)
+    y_scale = list(range(min_y, max_y, int(radius_y))) if radius_y > 0 else [1]
+    x_scale = list(range(min_x, max_x, int(radius_x))) if radius_x > 0 else [1]
 
     if len(y_scale) < MarksRows:
         y_scale.append(max_y)

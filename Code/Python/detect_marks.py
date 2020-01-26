@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 # (c) Shahar Gino, July-2017, sgino209@gmail.com
 
 from copy import deepcopy
@@ -19,7 +19,7 @@ def find_possible_marks(frame_thresh, MinPixelWidth, MaxPixelWidth, MinPixelHeig
     frame_thresh_copy = frame_thresh.copy()
 
     # Find all contours in the image:
-    _, contours, _ = findContours(frame_thresh_copy, RETR_LIST, CHAIN_APPROX_SIMPLE)
+    contours, _ = findContours(frame_thresh_copy, RETR_LIST, CHAIN_APPROX_SIMPLE)
 
     # Foreach contour, check if it describes a possible character:
     height, width = frame_thresh_copy.shape
@@ -228,7 +228,7 @@ def perspective_alignment_opt0(possible_marks_list, rotation_angle_deg, debugMod
     debug("(xR,yR) after Perspective Fix:", debugMode)
     if debugMode:
         X = array([[x.intCenterX_r, x.intCenterY_r] for x in possible_marks_list])
-        print X.T
+        print(X.T)
 
     return rect_src, rect_dst
 
@@ -399,11 +399,11 @@ def perspective_alignment_opt1(possible_marks_list, debugMode):
 
     if debugMode:
         debug("Perspective Homography Matrix (H):", True)
-        print H
+        print(H)
         debug("Perspective SRC points (marks):", True)
-        print X[:,0:2].T
+        print(X[:,0:2].T)
         debug("Perspective DST points (~H*SRC):", True)
-        print dst[:,0].T
+        print(dst[:,0].T)
 
     return rect_src, rect_dst
 

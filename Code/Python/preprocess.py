@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 # (c) Shahar Gino, July-2017, sgino209@gmail.com
 
 from cv2 import split, merge, GaussianBlur, adaptiveThreshold, getStructuringElement, morphologyEx, add, subtract,\
@@ -64,7 +64,7 @@ def imageEnhancement(imgOriginal, clahe_clipLimit, clahe_tileGridSize, gamma, de
         """" Basic LUT generation, returns a 256-element list of the interpolated f(x) values for every value of x. """
 
         spl = UnivariateSpline(x, y)
-        return spl(xrange(256))
+        return spl(range(256))
 
     # -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
 
