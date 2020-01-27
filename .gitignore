@@ -131,4 +131,5 @@ dmypy.json
 # proprietry
 .idea/
 .DS_Store
+results_*/
 Doc/PoC_demo.mov

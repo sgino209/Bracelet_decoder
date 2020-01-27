@@ -141,7 +141,7 @@ cv::Mat crop_roi_from_image(cv::Mat &frame, uint_x4_t roi) {
       double roiCy = roi.x2 + roiH / 2.0;
    
       if (frame.dims == 2) {
-        cv::cvtColor(frame.clone(), frame, CV_RGB2BGR);    
+        cv::cvtColor(frame.clone(), frame, cv::COLOR_RGB2BGR);    
       }
       cv::getRectSubPix(frame, 
                         cv::Size2f((float)roiW, (float)roiH),

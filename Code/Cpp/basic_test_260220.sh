@@ -3,7 +3,7 @@
 base='/Users/shahargino/MEGA/ImageProcessing'
 
 bracelet_test() {
-  res=`python3 main.py -i $1 $2 | grep -w $3`
+  res=`build/bracelet_decoder -i $1 $2 | grep -w $3`
   if [ "$res" ]; then
     echo "$1\t PASSED!"
   else

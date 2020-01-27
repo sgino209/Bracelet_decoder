@@ -15,7 +15,7 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
 
   // Find all contours in the image: 
   std::vector<std::vector<cv::Point>> contours;
-  cv::findContours(frame_thresh.clone(), contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
+  cv::findContours(frame_thresh.clone(), contours, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
 
   // Foreach contour, check if it describes a possible character:
   cv::Mat frame_contours = cv::Mat::zeros(frame_thresh.size(), CV_8UC3);
@@ -235,7 +235,7 @@ rotation_align_t rotation_alignment(mark_list_t &possible_marks_list, bool debug
     }
     cv::Mat mat = cv::Mat(num, 2, CV_32FC1, &arr);
     cv::Mat cov, mean;
-    cv::calcCovarMatrix(mat, cov, mean, CV_COVAR_NORMAL | CV_COVAR_ROWS);
+    cv::calcCovarMatrix(mat, cov, mean, cv::COVAR_NORMAL | cv::COVAR_ROWS);
     cov = cov / (mat.rows - 1);
     cv::eigen(cov, S, Vt);
     Vt *= -1;

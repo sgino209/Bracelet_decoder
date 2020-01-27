@@ -16,6 +16,7 @@ LDFLAGS		:= 	-L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_imgproc -l
 
 INC		:= 	-I/usr/local/lib \
     			-I/usr/local/include \
+    			-I/usr/local/include/opencv4 \
 			-I~/opencv/** \
 			-I./
 

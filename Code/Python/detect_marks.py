@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 # (c) Shahar Gino, July-2017, sgino209@gmail.com
 
 from copy import deepcopy
@@ -73,8 +73,8 @@ def find_possible_marks(frame_thresh, MinPixelWidth, MaxPixelWidth, MinPixelHeig
                                  possible_mark.intCenterX_r-3:possible_mark.intCenterX_r+3, 0] = 255
 
         for possible_mark in possible_marks_final:
-            frame_possible_marks[possible_mark.intCenterY_r - 3:possible_mark.intCenterY_r + 3,
-                                 possible_mark.intCenterX_r - 3:possible_mark.intCenterX_r + 3, 1:3] = 255
+            frame_possible_marks[possible_mark.intCenterY_r-3:possible_mark.intCenterY_r+3,
+                                 possible_mark.intCenterX_r-3:possible_mark.intCenterX_r+3, 1:3] = 255
 
         putText(frame_possible_marks, "Original", (10, 30), FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         putText(frame_possible_marks, "Rotation fix (SVD)", (10, 70), FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
@@ -388,8 +388,8 @@ def perspective_alignment_opt1(possible_marks_list, debugMode):
     for mark in possible_marks_list:
         for k in range(len(X)):
             if X[k,0] == mark.intCenterX_r and X[k,1] == mark.intCenterY_r:
-                mark.intCenterX_r = dst[k,0][0]
-                mark.intCenterY_r = dst[k,0][1]
+                mark.intCenterX_r = int(dst[k,0][0])
+                mark.intCenterY_r = int(dst[k,0][1])
 
     # -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
 

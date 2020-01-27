@@ -10,7 +10,7 @@ void preprocess(cv::Mat &imgOriginal, cv::Mat &imgGrayscale, cv::Mat &imgThresh,
     cv::Mat imgHSV;
     std::vector<cv::Mat> vectorOfHSVImages;
     cv::Mat imgValue;
-    cv::cvtColor(imgOriginal, imgHSV, CV_BGR2HSV);
+    cv::cvtColor(imgOriginal, imgHSV, cv::COLOR_BGR2HSV);
     cv::split(imgHSV, vectorOfHSVImages);
     imgGrayscale = vectorOfHSVImages[2];
 
@@ -24,7 +24,7 @@ void preprocess(cv::Mat &imgOriginal, cv::Mat &imgGrayscale, cv::Mat &imgThresh,
     cv::GaussianBlur(imgMaxContrastGrayscale, imgBlurred, gaussKernel, 0);
 
     // Adaptive Threshold:
-    cv::adaptiveThreshold(imgBlurred, imgThresh, 255.0, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY_INV, PreprocessThreshBlockSize, PreprocessThreshweight);    
+    cv::adaptiveThreshold(imgBlurred, imgThresh, 255.0, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, PreprocessThreshBlockSize, PreprocessThreshweight);    
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------
@@ -229,14 +229,14 @@ cv::Mat imageEnhancement(cv::Mat &imgOriginal, double clahe_clipLimit, int clahe
     // Saturation effect (S incr.) + Gamma:
     cv::Mat imgHSV, c_s, imgSat, imgGamma;
     std::vector<cv::Mat> vectorOfHSVImages;
-    cv::cvtColor(imgWarm, imgHSV, CV_BGR2HSV);
+    cv::cvtColor(imgWarm, imgHSV, cv::COLOR_BGR2HSV);
     cv::split(imgHSV, vectorOfHSVImages);
     cv::Mat s = vectorOfHSVImages[1].clone();
     cv::LUT(s, incr_ch_lut, c_s);
     c_s.convertTo(c_s, CV_8UC1);
     c_s.copyTo(vectorOfHSVImages[1]);
     cv::merge(vectorOfHSVImages, imgSat);
-    cv::cvtColor(imgSat.clone(), imgSat, CV_HSV2BGR);    
+    cv::cvtColor(imgSat.clone(), imgSat, cv::COLOR_HSV2BGR);    
     cv::LUT(imgSat, gamma3_lut, imgGamma);
 
     // Sharpening:

@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 # (c) Shahar Gino, July-2017, sgino209@gmail.com
 
 import wx

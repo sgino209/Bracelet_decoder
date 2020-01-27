@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 # (c) Shahar Gino, July-2017, sgino209@gmail.com
 
 from math import sqrt
@@ -29,8 +29,8 @@ class PossibleMark:
 
         self.fltExtent = float(contourArea(self.contour)) / self.intBoundingRectArea
 
-        self.intCenterX = (self.intBoundingRectX + self.intBoundingRectX + self.intBoundingRectWidth) / 2
-        self.intCenterY = (self.intBoundingRectY + self.intBoundingRectY + self.intBoundingRectHeight) / 2
+        self.intCenterX = int((self.intBoundingRectX + self.intBoundingRectX + self.intBoundingRectWidth) / 2)
+        self.intCenterY = int((self.intBoundingRectY + self.intBoundingRectY + self.intBoundingRectHeight) / 2)
 
         self.intCenterX_r = 0
         self.intCenterY_r = 0
