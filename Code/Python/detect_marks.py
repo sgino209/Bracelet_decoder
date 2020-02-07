@@ -4,14 +4,28 @@
 from copy import deepcopy
 from possible_mark import PossibleMark
 from auxiliary import Colors, distance_mse, debug, error
-from numpy import zeros, uint8, median, array, linalg, mean, arctan2, pi, cos, sin, float32, sqrt
+from numpy import zeros, uint8, median, array, linalg, mean, arctan2, pi, cos, sin, float32, sqrt, linspace
 from cv2 import findContours, RETR_LIST, CHAIN_APPROX_SIMPLE, drawContours, imwrite, putText, FONT_HERSHEY_SIMPLEX, \
-    findHomography, perspectiveTransform, polylines, LINE_AA
+    findHomography, perspectiveTransform, polylines, LINE_AA, HoughCircles, HOUGH_GRADIENT
+
+# ---------------------------------------------------------------------------------------------------------------
+
+def circle_to_contour(circle, points_per_contour, resize_factor):
+    """ Gets a Circle (x,y,radius) and returns the corresponding contour (array of x,y points) """
+
+    xc, yc, r = circle
+    r *= resize_factor
+    contour = []
+    for i in linspace(0, 2*pi, points_per_contour):
+        y = int(yc + r * sin(i))
+        x = int(xc + r * cos(i))
+        contour.append([[x, y]])
+    return array(contour)
 
 # ---------------------------------------------------------------------------------------------------------------
 def find_possible_marks(frame_thresh, MinPixelWidth, MaxPixelWidth, MinPixelHeight, MaxPixelHeight,
                         MinAspectRatio, MaxAspectRatio, MinPixelArea, MaxPixelArea, MinExtent, MaxExtent,
-                        MaxDrift, perspectiveMode, debugMode=False):
+                        MaxDrift, perspectiveMode, FindContoursMode, HoughParams, debugMode=False):
     """ Find all possible bracelet marks (finds all contours that could be representing marks) """
 
     # Initialization:
@@ -19,11 +33,37 @@ def find_possible_marks(frame_thresh, MinPixelWidth, MaxPixelWidth, MinPixelHeig
     frame_thresh_copy = frame_thresh.copy()
 
     # Find all contours in the image:
-    contours, _ = findContours(frame_thresh_copy, RETR_LIST, CHAIN_APPROX_SIMPLE)
+    contours = []
+    if FindContoursMode == "Legacy":
 
-    # Foreach contour, check if it describes a possible character:
+        contours, _ = findContours(frame_thresh_copy, RETR_LIST, CHAIN_APPROX_SIMPLE)
+
+    elif FindContoursMode == "Hough":
+
+        circles = HoughCircles(
+            image=frame_thresh_copy,                                 # 8-bit, single channel image.
+            method=HOUGH_GRADIENT,                                   # Defines the method to detect circles in images
+            dp=HoughParams[0] if HoughParams[0] > 0 else 1,          # Large dp values -->  smaller accumulator array
+            minDist=HoughParams[1] if HoughParams[1] > 0 else 60,    # Min distance between the detected circles centers
+            param1=HoughParams[2] if HoughParams[2] > 0 else 50,     # Gradient value used to handle edge detection
+            param2=HoughParams[3] if HoughParams[3] > 0 else 18,     # Accumulator thresh val (smaller = more circles)
+            minRadius=HoughParams[4] if HoughParams[4] > 0 else 20,  # Minimum size of the radius (in pixels)
+            maxRadius=HoughParams[5] if HoughParams[5] > 0 else 50   # Maximum size of the radius (in pixels)
+        )
+
+        if circles is not None:
+            for i in circles[0, :]:
+                contours.append(circle_to_contour(i, 50, 0.7))
+
+    else:
+        error("Unsupported FindContoursMode mode: %s" % FindContoursMode)
+
+    # Create contours image:
     height, width = frame_thresh_copy.shape
     frame_contours = zeros((height, width, 3), uint8)
+    drawContours(frame_contours, contours, -1, Colors.white)
+
+    # Foreach contour, check if it describes a possible character:
     possible_marks_cntr = 0
     for i in range(0, len(contours)):
 
@@ -41,7 +81,7 @@ def find_possible_marks(frame_thresh, MinPixelWidth, MaxPixelWidth, MinPixelHeig
             possible_marks_list.append(possible_mark)
 
         if debugMode:
-            drawContours(frame_contours, contours, i, Colors.white)
+            print(possible_mark, possible_marks_cntr)
 
     if len(possible_marks_list) == 0:
         return possible_marks_list, 0
@@ -63,6 +103,7 @@ def find_possible_marks(frame_thresh, MinPixelWidth, MaxPixelWidth, MinPixelHeig
     # -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
 
     if debugMode:
+
         frame_possible_marks = zeros((height, width, 3), uint8)
 
         for possible_mark in possible_marks_wo_outliers:

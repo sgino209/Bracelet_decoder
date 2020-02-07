@@ -72,6 +72,6 @@ class PossibleMark:
     def __str__(self):
         """ print mark method """
 
-        return "(x,y, xR,yR, w,h, BndArea,AspRatio,extent)=(%d,%d, %d,%d, %d,%d, %d,%.2f.%.2f)" % \
+        return "(x,y, xR,yR, w,h, BndArea,AspRatio,extent)=(%d,%d, %d,%d, %d,%d, %d,%.2f.%.2f, %s)" % \
                (self.intCenterX, self.intCenterY, self.intCenterX_r, self.intCenterY_r, self.intBoundingRectWidth,
-                self.intBoundingRectHeight, self.intBoundingRectArea, self.fltAspectRatio, self.fltExtent)
+                self.intBoundingRectHeight, self.intBoundingRectArea, self.fltAspectRatio, self.fltExtent, str(self.boundingRect))

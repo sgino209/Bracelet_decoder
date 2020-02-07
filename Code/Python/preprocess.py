@@ -1,31 +1,60 @@
 #!/usr/bin/python3
 # (c) Shahar Gino, July-2017, sgino209@gmail.com
 
-from cv2 import split, merge, GaussianBlur, adaptiveThreshold, getStructuringElement, morphologyEx, add, subtract,\
-    cvtColor, createCLAHE, addWeighted, imwrite, LUT, COLOR_BGR2HSV, COLOR_HSV2BGR, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, \
-    MORPH_RECT, MORPH_TOPHAT, MORPH_BLACKHAT
+from cv2 import split, merge, GaussianBlur, medianBlur, adaptiveThreshold, getStructuringElement, morphologyEx, add, \
+    subtract, cvtColor, createCLAHE, addWeighted, imwrite, resize, Canny, LUT, COLOR_BGR2HSV, COLOR_HSV2BGR,\
+    ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, MORPH_RECT, MORPH_TOPHAT, MORPH_BLACKHAT
 from scipy.interpolate import UnivariateSpline
 from numpy import uint8, array, arange
+from auxiliary import error
 
 # ---------------------------------------------------------------------------------------------------------------
-def preprocess(imgOriginal, PreprocessGaussKernel, PreprocessThreshBlockSize, PreprocessThreshweight, PreprocessMorphKernel):
+def preprocess(imgOriginal, PreprocessCvcSel, PreprocessMode, PreprocessGaussKernel, PreprocessThreshBlockSize,
+               PreprocessThreshweight, PreprocessMorphKernel, PreprocessMedianBlurKernel, PreprocessCannyThr):
     """ CSC, Contrast stretch (morph.), Blurring and Adaptive-Threshold """
 
     # Color-Space-Conversion (CSC): switch from BGR to HSV and take "V" component:
     imgHSV = cvtColor(imgOriginal, COLOR_BGR2HSV)
+    imgHSV_H, imgHSV_S, imgHSV_V = split(imgHSV)
 
-    _, _, imgGrayscale = split(imgHSV)
+    if PreprocessCvcSel == "H":
+        imgGrayscale = imgHSV_H
+    elif PreprocessCvcSel == "S":
+        imgGrayscale = imgHSV_S
+    elif PreprocessCvcSel == "V":
+        imgGrayscale = imgHSV_V
+    else:
+        error("Unsupported PreprocessCvcSel mode: %s" % PreprocessCvcSel)
 
-    # Increase contrast (morphological):
-    imgMaxContrastGrayscale = maximizeContrast(imgGrayscale, PreprocessMorphKernel)
+    # -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
 
-    # Blurring:
-    imgBlurred = GaussianBlur(imgMaxContrastGrayscale, PreprocessGaussKernel, 0)
+    if PreprocessMode == "Legacy":
 
-    # Adaptive Threshold:
-    imgThresh = adaptiveThreshold(imgBlurred, 255.0, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, PreprocessThreshBlockSize, PreprocessThreshweight)
+        # Increase Contrast (morphological):
+        imgMaxContrastGrayscale = maximizeContrast(imgGrayscale, PreprocessMorphKernel)
 
-    return imgGrayscale, imgThresh
+        # Blurring:
+        imgBlurred = GaussianBlur(imgMaxContrastGrayscale, PreprocessGaussKernel, 0)
+
+        # Adaptive Threshold:
+        imgThresh = adaptiveThreshold(imgBlurred, 255.0, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, PreprocessThreshBlockSize, PreprocessThreshweight)
+
+    # -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
+
+    elif PreprocessMode == "BlurAndCanny":
+
+        # Blurring:
+        imgBlurred = medianBlur(imgGrayscale, PreprocessMedianBlurKernel)
+
+        # Canny Edge Detection:
+        imgThresh = Canny(imgBlurred, PreprocessCannyThr/2, PreprocessCannyThr)
+
+    # -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
+
+    else:
+        error("Unsupported PreprocessMode mode: %s" % PreprocessMode)
+
+    return imgBlurred, imgThresh
 
 # ---------------------------------------------------------------------------------------------------------------
 def maximizeContrast(imgGrayscale, PreprocessMorphKernel):

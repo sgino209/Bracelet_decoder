@@ -3,7 +3,6 @@
 
 import wx
 import sys
-from ast import literal_eval
 from main import main as lpr_analyzer
 from auxiliary import draw_roi as draw_roi_aux
 from numpy import zeros, uint8, max, frombuffer

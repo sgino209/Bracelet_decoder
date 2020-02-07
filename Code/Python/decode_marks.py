@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 # (c) Shahar Gino, July-2017, sgino209@gmail.com
 
-from numpy import zeros, uint8, array, sort
 from auxiliary import debug, error
+from numpy import zeros, uint8, array
 from cv2 import putText, FONT_HERSHEY_SIMPLEX, imwrite
 
 # ---------------------------------------------------------------------------------------------------------------
