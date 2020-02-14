@@ -13,7 +13,7 @@ def preprocess(imgOriginal, PreprocessCvcSel, PreprocessMode, PreprocessGaussKer
                PreprocessThreshweight, PreprocessMorphKernel, PreprocessMedianBlurKernel, PreprocessCannyThr):
     """ CSC, Contrast stretch (morph.), Blurring and Adaptive-Threshold """
 
-    # Color-Space-Conversion (CSC): switch from BGR to HSV and take "V" component:
+    # Color-Space-Conversion (CSC): switch from BGR to HSV and take the requested component:
     imgHSV = cvtColor(imgOriginal, COLOR_BGR2HSV)
     imgHSV_H, imgHSV_S, imgHSV_V = split(imgHSV)
 

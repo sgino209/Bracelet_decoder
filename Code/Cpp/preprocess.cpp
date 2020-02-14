@@ -3,28 +3,56 @@
 
 #include "preprocess.hpp"
 
-void preprocess(cv::Mat &imgOriginal, cv::Mat &imgGrayscale, cv::Mat &imgThresh, uint_xy_t PreprocessGaussKernel,
-                unsigned int PreprocessThreshBlockSize, unsigned int PreprocessThreshweight, uint_xy_t PreprocessMorphKernel) {
+void preprocess(cv::Mat &imgOriginal, cv::Mat &imgGrayscale, cv::Mat &imgThresh, std::string PreprocessCvcSel, std::string PreprocessMode,
+                uint_xy_t PreprocessGaussKernel, unsigned int PreprocessThreshBlockSize, unsigned int PreprocessThreshweight, 
+                uint_xy_t PreprocessMorphKernel, unsigned int PreprocessMedianBlurKernel, unsigned int PreprocessCannyThr) {
     
-    // Color-Space-Conversion (CSC): switch from BGR to HSV and take "V" component:
+    // Color-Space-Conversion (CSC): switch from BGR to HSV and take the requested component:
     cv::Mat imgHSV;
     std::vector<cv::Mat> vectorOfHSVImages;
     cv::Mat imgValue;
     cv::cvtColor(imgOriginal, imgHSV, cv::COLOR_BGR2HSV);
     cv::split(imgHSV, vectorOfHSVImages);
-    imgGrayscale = vectorOfHSVImages[2];
+   
+    if      (PreprocessCvcSel == "H") { imgGrayscale = vectorOfHSVImages[0]; }
+    else if (PreprocessCvcSel == "S") { imgGrayscale = vectorOfHSVImages[1]; }
+    else if (PreprocessCvcSel == "V") { imgGrayscale = vectorOfHSVImages[2]; }
+    else {
+        error("Unsupported PreprocessCvcSel mode: " + PreprocessCvcSel);
+    }
+    
+    // -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
+    
+    if (PreprocessMode == "Legacy") {
 
-    // Increase contrast (morphological):
-    cv::Mat imgMaxContrastGrayscale = maximizeContrast(imgGrayscale, PreprocessMorphKernel);
+        // Increase contrast (morphological):
+        cv::Mat imgMaxContrastGrayscale = maximizeContrast(imgGrayscale, PreprocessMorphKernel);
 
-    // Blurring:
-    cv::Mat imgBlurred;
-    cv::Size gaussKernel;
-    gaussKernel = cv::Size(PreprocessGaussKernel.x, PreprocessGaussKernel.y);
-    cv::GaussianBlur(imgMaxContrastGrayscale, imgBlurred, gaussKernel, 0);
+        // Blurring:
+        cv::Mat imgBlurred;
+        cv::Size gaussKernel;
+        gaussKernel = cv::Size(PreprocessGaussKernel.x, PreprocessGaussKernel.y);
+        cv::GaussianBlur(imgMaxContrastGrayscale, imgBlurred, gaussKernel, 0);
 
-    // Adaptive Threshold:
-    cv::adaptiveThreshold(imgBlurred, imgThresh, 255.0, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, PreprocessThreshBlockSize, PreprocessThreshweight);    
+        // Adaptive Threshold:
+        cv::adaptiveThreshold(imgBlurred, imgThresh, 255.0, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, PreprocessThreshBlockSize, PreprocessThreshweight);
+    }
+
+    else if (PreprocessMode == "BlurAndCanny") {
+        
+        // Blurring:
+        cv::Mat imgBlurred;
+        cv::medianBlur(imgGrayscale, imgBlurred, PreprocessMedianBlurKernel);
+
+        // Canny Edge Detection:
+        cv::Canny(imgBlurred, imgThresh, PreprocessCannyThr/2, PreprocessCannyThr);
+    }
+
+    // -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
+    
+    else {
+        error("Unsupported PreprocessMode mode: " + PreprocessMode);
+    }
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------

@@ -9,6 +9,7 @@ extern void preprocess(cv::Mat &imgOriginal, cv::Mat &imgGrayscale, cv::Mat &img
 
 extern void set_xy(uint_xy_t *d, std::string str);
 extern void set_x4(uint_x4_t *d, std::string str);
+extern void set_x6(uint_x6_t *d, std::string str);
 
 std::string decode_frame(args_t args) {
 
@@ -29,27 +30,53 @@ std::string decode_frame(args_t args) {
     frame_orig = cv::imread(args.ImageFile);
   }
 
-  // Resizing:
+  // Resizing preparations:
   cv::Size s = frame_orig.size();
-  cv::resize(frame_orig.clone(), imgResized, (s.width > s.height) ? resizingVec1 : resizingVec2);
+  cv::Size resizingVec;
+  if (args.PreprocessMode == "Legacy") {
+      resizingVec = resizingVec1;
+      if (s.width < s.height) {
+          resizingVec = resizingVec2;
+      }
+  }
+  else if (args.PreprocessMode == "BlurAndCanny") {
+      resizingVec = resizingVec3;
+  }
+  else {
+      error("Unsupported PreprocessMode mode: " + args.PreprocessMode);
+  }
   
-  // ROI cropping:
-  imgCropped = crop_roi_from_image(imgResized, args.ROI);
+  // Resizing and ROI cropping:
+  cv::Mat image;
+  if (args.PreprocessMode == "Legacy") {
+      cv::resize(frame_orig.clone(), imgResized, resizingVec);
+      imgCropped = crop_roi_from_image(imgResized, args.ROI);
+      image = imgCropped;
+  }
+  else if (args.PreprocessMode == "BlurAndCanny") {
+      imgCropped = crop_roi_from_image(frame_orig, args.ROI);
+      cv::resize(imgCropped.clone(), imgResized, resizingVec);
+      image = imgResized;
+  }
 
   // Image enhancement:
-  imgEnhanced = imgCropped.clone();
+  imgEnhanced = image.clone();
   if (args.imgEnhancementEn) {
-    imgEnhanced = imageEnhancement(imgCropped, 2, 8, 3, args.debugMode); //clahe_clipLimit=2, clahe_tileGridSize=8, gamme=3
+    imgEnhanced = imageEnhancement(image, 2, 8, 3, args.debugMode); //clahe_clipLimit=2, clahe_tileGridSize=8, gamme=3
   }
   
   // Pre-processing (CSC --> contrast --> blur --> threshold):
   preprocess(imgEnhanced,
              frame_gray,
              frame_thresh,
+             args.PreprocessCvcSel,
+             args.PreprocessMode,
              args.PreprocessGaussKernel,
              args.PreprocessThreshBlockSize,
              args.PreprocessThreshweight,
-             args.PreprocessMorphKernel);
+             args.PreprocessMorphKernel,
+             args.PreprocessMedianBlurKernel,
+             args.PreprocessCannyThr);
 
   // Find bracelet marks:
   rotation_angle = find_possible_marks(possible_marks,
@@ -168,12 +195,16 @@ args_t load_default_args() {
 
   args_t args;
 
-  args.ImageFile = "/Users/shahargino/Documents/ImageProcessing/Bracelet_decoder/Database/1.jpg";
+  args.ImageFile = "/Users/shahargino/Documents/ImageProcessing/Bracelet_decoder/Database/180717/24.jpg";
+  args.PreprocessCvcSel = "V";
+  args.PreprocessMode = "Legacy";
   set_xy(&args.PreprocessGaussKernel, "(5,5)");
   args.PreprocessThreshBlockSize = 19;
   args.PreprocessThreshweight = 7;
   set_xy(&args.PreprocessMorphKernel, "(3,3)");
-  set_x4(&args.ROI, "(0,0)"); // if set_x4 is not recognized, simply replace with args.ROI.x1=0 args.ROI.x2=0;
+  args.PreprocessMedianBlurKernel = 13;
+  args.PreprocessCannyThr = 80;
+  args.imgEnhancementEn = false;
   args.MinPixelWidth = 7;
   args.MaxPixelWidth = 30;
   args.MinPixelHeight = 7;
@@ -187,7 +218,10 @@ args_t load_default_args() {
   args.MaxDrift = 2.5;
   args.MarksRows = 3;
   args.MarksCols = 10;
-  args.imgEnhancementEn = false;
+  set_x4(&args.ROI, "(0,0)"); // if set_x4 is not recognized, simply replace with args.ROI.x1=0 args.ROI.x2=0;
+  args.FindContoursMode = "Legacy";
+  set_x6(&args.HoughParams, "(-1,-1,-1,-1,-1,-1)");
+  args.PerspectiveMode = 0;
   args.debugMode = false;
 
   return args;
@@ -197,11 +231,15 @@ args_t load_default_args() {
 void print_args(args_t args) {
 
   printf("args.ImageFile = %s\n", args.ImageFile.c_str());
+  printf("args.PreprocessCvcSel = %s\n", args.PreprocessCvcSel.c_str());
+  printf("args.PreprocessMode = %s\n", args.PreprocessMode.c_str());
   printf("args.PreprocessGaussKernel = (%d,%d)\n", args.PreprocessGaussKernel.x, args.PreprocessGaussKernel.y);
   printf("args.PreprocessThreshBlockSize = %d\n", args.PreprocessThreshBlockSize);
   printf("args.PreprocessThreshweight = %d\n", args.PreprocessThreshweight);
   printf("args.PreprocessMorphKernel = (%d,%d)\n", args.PreprocessMorphKernel.x, args.PreprocessMorphKernel.y);
-  printf("args.ROI = (%d,%d,%d,%d,%d)\n", args.ROI.x1, args.ROI.x2, args.ROI.x3, args.ROI.x4, args.ROI.len);
+  printf("args.PreprocessMedianBlurKernel = %d\n", args.PreprocessMedianBlurKernel);
+  printf("args.PreprocessCannyThr = %d\n", args.PreprocessCannyThr);
+  printf("args.imgEnhancementEn = %d\n", args.imgEnhancementEn);
   printf("args.MinPixelWidth = %d\n", args.MinPixelWidth);
   printf("args.MaxPixelWidth = %d\n", args.MaxPixelWidth);
   printf("args.MinPixelHeight = %d\n", args.MinPixelHeight);
@@ -215,7 +253,10 @@ void print_args(args_t args) {
   printf("args.MaxDrift = %.1f\n", args.MaxDrift);
   printf("args.MarksRows = %d\n", args.MarksRows);
   printf("args.MarksCols = %d\n", args.MarksCols);
-  printf("args.imgEnhancementEn = %d\n", args.imgEnhancementEn);
+  printf("args.ROI = (%d,%d,%d,%d,%d)\n", args.ROI.x1, args.ROI.x2, args.ROI.x3, args.ROI.x4, args.ROI.len);
+  printf("args.FindContoursMode = %s\n", args.FindContoursMode.c_str());
+  printf("args.HoughParams = (%d,%d,%d,%d,%d,%d)\n", args.HoughParams.x1, args.HoughParams.x2, args.HoughParams.x3, args.HoughParams.x4, args.HoughParams.x5, args.HoughParams.x6 );
+  printf("args.PerspectiveMode = %d\n", args.PerspectiveMode);
   printf("args.debugMode = %d\n", args.debugMode);
 }
 

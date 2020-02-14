@@ -66,12 +66,33 @@ void set_x4(uint_x4_t *d, std::string str) {
   }
 }
 
+void set_x6(uint_x6_t *d, std::string str) {
+  std::size_t found1 = str.find("(");
+  std::size_t found2 = str.find(",");
+  std::size_t found3 = str.find(",");
+  std::size_t found4 = str.find(",");
+  std::size_t found5 = str.find(",");
+  std::size_t found6 = str.find(",");
+  std::size_t found7 = str.find(")");
+  d->x1 = atoi(str.substr(found1+1, found2-found1-1).c_str());
+  d->x2 = atoi(str.substr(found2+1, found3-found2-1).c_str());
+  d->x3 = atoi(str.substr(found3+1, found4-found3-1).c_str());
+  d->x4 = atoi(str.substr(found4+1, found5-found4-1).c_str());
+  d->x5 = atoi(str.substr(found5+1, found6-found5-1).c_str());
+  d->x6 = atoi(str.substr(found6+1, found7-found6-1).c_str());
+  d->len = 6;
+}
+
 typedef enum {
-  ARG_PREPROCESSGAUSSKERNEL = 0,
+  ARG_PREPROCESSCVCSEL = 0,
+  ARG_PREPROCESSMODE,
+  ARG_PREPROCESSGAUSSKERNEL,
   ARG_PREPROCESSTHRESHBLOCKSIZE,
   ARG_PREPROCESSTHRESHWEIGHT,
   ARG_PREPROCESSMORPHKERNEL,
-  ARG_ROI,
+  ARG_PREPROCESSMEDIANBLURKERNEL,
+  ARG_PREPROCESSCANNYTHR,
+  ARG_IMGENHANCEMENTEN,
   ARG_MINPIXELWIDTH,
   ARG_MAXPIXELWIDTH,
   ARG_MINPIXELHEIGHT,
@@ -80,12 +101,15 @@ typedef enum {
   ARG_MAXASPECTRATIO,
   ARG_MINPIXELAREA,
   ARG_MAXPIXELAREA,
-  ARG_MINEXTENT,
-  ARG_MAXEXTENT,
   ARG_MAXDRIFT,
   ARG_MARKROWS,
   ARG_MARKCOLS,
-  ARG_IMGENHANCEMENTEN,
+  ARG_ROI,
+  ARG_FINDCONTOURSMODE,
+  ARG_HOUGHPARAMS,
+  ARG_PERSPECTIVEMODE,
+  ARG_MINEXTENT,
+  ARG_MAXEXTENT,
   ARG_DEBUG,
   ARGS_NUM
 } bracelet_decoder_arg_t;
@@ -95,11 +119,15 @@ const struct option longopts[] =
   {"version",                    no_argument,       0, 'v' },
   {"help",                       no_argument,       0, 'h' },
   {"image",                      required_argument, 0, 'i' },
+  {"PreprocessCvcSel",           required_argument, 0, ARG_PREPROCESSCVCSEL },
+  {"PreprocessMode",             required_argument, 0, ARG_PREPROCESSMODE },
   {"PreprocessGaussKernel",      required_argument, 0, ARG_PREPROCESSGAUSSKERNEL },
   {"PreprocessThreshBlockSize",  required_argument, 0, ARG_PREPROCESSTHRESHBLOCKSIZE },
   {"PreprocessThreshweight",     required_argument, 0, ARG_PREPROCESSTHRESHWEIGHT },
   {"PreprocessMorphKernel",      required_argument, 0, ARG_PREPROCESSMORPHKERNEL },
-  {"ROI",                        required_argument, 0, ARG_ROI },
+  {"PreprocessMedianBlurKernel", required_argument, 0, ARG_PREPROCESSMEDIANBLURKERNEL },
+  {"PreprocessCannyThr",         required_argument, 0, ARG_PREPROCESSCANNYTHR },
+  {"imgEnhancementEn",           no_argument,       0, ARG_IMGENHANCEMENTEN },
   {"MinPixelWidth",              required_argument, 0, ARG_MINPIXELWIDTH },
   {"MaxPixelWidth",              required_argument, 0, ARG_MAXPIXELWIDTH },
   {"MinPixelHeight",             required_argument, 0, ARG_MINPIXELHEIGHT },
@@ -113,7 +141,10 @@ const struct option longopts[] =
   {"MaxDrift",                   required_argument, 0, ARG_MAXDRIFT },
   {"MarksRows",                  required_argument, 0, ARG_MARKROWS },
   {"MarksCols",                  required_argument, 0, ARG_MARKCOLS },
-  {"imgEnhancementEn",           no_argument,       0, ARG_IMGENHANCEMENTEN },
+  {"ROI",                        required_argument, 0, ARG_ROI },
+  {"FindContoursMode ",          required_argument, 0, ARG_FINDCONTOURSMODE },
+  {"HoughParams",                required_argument, 0, ARG_HOUGHPARAMS },
+  {"PerspectiveMode",            required_argument, 0, ARG_PERSPECTIVEMODE },
   {"debug",                      no_argument,       0, ARG_DEBUG }
 };
 

@@ -24,8 +24,8 @@ def usage():
     print('Optional preprocssing flags (cont.):          --PreprocessThreshweight --PreprocessMorphKernel --PreprocessMedianBlurKernel')
     print('Optional preprocssing flags (cont.):          --PreprocessCannyThr --imgEnhancementEn')
     print('Optional marks-detection flags:               --MinPixelWidth --MaxPixelWidth --MinPixelHeight --MaxPixelHeight --MinAspectRatio --MaxAspectRatio')
-    print('Optional marks-detection flags (cont.):       --MinPixelArea --MaxPixelArea --MaxDrift --MarksRows --MarksCols --ROI')
-    print('Optional marks-detection flags (cont.):       --FindContoursMode --HoughParams, --perspectiveMode')
+    print('Optional marks-detection flags (cont.):       --MinPixelArea --MaxPixelArea --MinExtent --MaxExtent --MaxDrift --MarksRows --MarksCols --ROI')
+    print('Optional marks-detection flags (cont.):       --FindContoursMode --HoughParams, --PerspectiveMode')
     print('Optional misc. flags:                         --debug --version')
     print('')
     print('Note about HoughParams settings (relevant only when FindContoursMode="Hough"):')
@@ -59,7 +59,7 @@ def main(_argv):
         PreprocessMorphKernel=(3, 3),
         PreprocessMedianBlurKernel=13,
         PreprocessCannyThr=80,
-        ROI=(0, 0),
+        imgEnhancementEn=False,
         MinPixelWidth=7,
         MaxPixelWidth=30,
         MinPixelHeight=7,
@@ -73,8 +73,8 @@ def main(_argv):
         MaxDrift=2.5,
         MarksRows=3,
         MarksCols=10,
-        imgEnhancementEn=False,
-        perspectiveMode=0,
+        ROI=(0, 0),
+        PerspectiveMode=0,
         FindContoursMode="Legacy",
         HoughParams=(-1, -1, -1, -1, -1, -1),
         debugMode=False
@@ -93,7 +93,7 @@ def main(_argv):
                                                  "MinPixelArea=", "MaxPixelArea=",
                                                  "MinExtent=", "MaxExtent=",
                                                  "MaxDrift=", "MarksRows=", "MarksCols=", "imgEnhancementEn",
-                                                 "perspectiveMode=", "FindContoursMode=", "HoughParams=",
+                                                 "PerspectiveMode=", "FindContoursMode=", "HoughParams=",
                                                  "debug", "version"])
 
         for opt, user_arg in opts:
@@ -148,8 +148,8 @@ def main(_argv):
                 args.MarksCols = int(user_arg)
             elif opt in "--imgEnhancementEn":
                 args.imgEnhancementEn = True
-            elif opt in "--perspectiveMode":
-                args.perspectiveMode = int(user_arg)
+            elif opt in "--PerspectiveMode":
+                args.PerspectiveMode = int(user_arg)
             elif opt in "--FindContoursMode":
                 args.FindContoursMode = user_arg
             elif opt in "--HoughParams":
@@ -179,7 +179,7 @@ def main(_argv):
         cwd = getcwd()
         chdir(envpath)
 
-    # Resizing:
+    # Resizing preparations:
     if args.PreprocessMode == "Legacy":
         resizingVec = (1600,1200)
         if (width < height):
@@ -189,7 +189,7 @@ def main(_argv):
     else:
         error("Unsupported PreprocessMode mode: %s" % args.PreprocessMode)
 
-    # ROI cropping:
+    # Resizing and ROI cropping:
     if args.PreprocessMode == "Legacy":
         imgResized = resize(frame_orig, resizingVec)
         imgCropped = crop_roi_from_image(imgResized, args.ROI)
@@ -229,7 +229,7 @@ def main(_argv):
                                                          args.MinExtent,
                                                          args.MaxExtent,
                                                          args.MaxDrift,
-                                                         args.perspectiveMode,
+                                                         args.PerspectiveMode,
                                                          args.FindContoursMode,
                                                          args.HoughParams,
                                                          args.debugMode)
