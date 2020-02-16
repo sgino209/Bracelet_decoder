@@ -68,11 +68,11 @@ void set_x4(uint_x4_t *d, std::string str) {
 
 void set_x6(uint_x6_t *d, std::string str) {
   std::size_t found1 = str.find("(");
-  std::size_t found2 = str.find(",");
-  std::size_t found3 = str.find(",");
-  std::size_t found4 = str.find(",");
-  std::size_t found5 = str.find(",");
-  std::size_t found6 = str.find(",");
+  std::size_t found2 = str.find(",", found1+1);
+  std::size_t found3 = str.find(",", found2+1);
+  std::size_t found4 = str.find(",", found3+1);
+  std::size_t found5 = str.find(",", found4+1);
+  std::size_t found6 = str.find(",", found5+1);
   std::size_t found7 = str.find(")");
   d->x1 = atoi(str.substr(found1+1, found2-found1-1).c_str());
   d->x2 = atoi(str.substr(found2+1, found3-found2-1).c_str());
@@ -145,7 +145,8 @@ const struct option longopts[] =
   {"FindContoursMode ",          required_argument, 0, ARG_FINDCONTOURSMODE },
   {"HoughParams",                required_argument, 0, ARG_HOUGHPARAMS },
   {"PerspectiveMode",            required_argument, 0, ARG_PERSPECTIVEMODE },
-  {"debug",                      no_argument,       0, ARG_DEBUG }
+  {"debug",                      no_argument,       0, ARG_DEBUG },
+  { NULL, 0, NULL, 0 }
 };
 
 // Main function:

@@ -7,6 +7,7 @@ from datetime import datetime
 from decode_marks import decode_marks
 from getopt import getopt, GetoptError
 from cv2 import imread, imwrite, resize
+from cv2 import __version__ as CV_VERSION
 from os import path, makedirs, getcwd, chdir
 from detect_marks import find_possible_marks
 from preprocess import preprocess, imageEnhancement
@@ -47,6 +48,9 @@ def usage():
 
 # ---------------------------------------------------------------------------------------------------------------
 def main(_argv):
+  
+    print("Start");
+    info("OpenCV version: " + CV_VERSION)
 
     # Default parameters:
     args = Struct(

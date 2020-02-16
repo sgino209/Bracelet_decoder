@@ -54,7 +54,9 @@ def preprocess(imgOriginal, PreprocessCvcSel, PreprocessMode, PreprocessGaussKer
     else:
         error("Unsupported PreprocessMode mode: %s" % PreprocessMode)
 
-    return imgBlurred, imgThresh
+    imgGrayscale = imgBlurred
+
+    return imgGrayscale, imgThresh
 
 # ---------------------------------------------------------------------------------------------------------------
 def maximizeContrast(imgGrayscale, PreprocessMorphKernel):

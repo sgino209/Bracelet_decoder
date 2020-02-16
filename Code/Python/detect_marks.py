@@ -41,7 +41,7 @@ def find_possible_marks(frame_thresh, MinPixelWidth, MaxPixelWidth, MinPixelHeig
     elif FindContoursMode == "Hough":
 
         circles = HoughCircles(
-            image=frame_thresh_copy,                                 # 8-bit, single channel image.
+            image=frame_thresh_copy,                                 # 8-bit, single channel image
             method=HOUGH_GRADIENT,                                   # Defines the method to detect circles in images
             dp=HoughParams[0] if HoughParams[0] > 0 else 1,          # Large dp values -->  smaller accumulator array
             minDist=HoughParams[1] if HoughParams[1] > 0 else 60,    # Min distance between the detected circles centers

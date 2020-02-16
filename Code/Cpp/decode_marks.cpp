@@ -38,7 +38,7 @@ std::string decode_marks(mark_list_t marks_list, unsigned int MarksRows, unsigne
   unsigned int radius_y = (unsigned int)((max_y - min_y) / (MarksRows - 1));
   unsigned int radius_x = (unsigned int)((max_x - min_x) / (MarksCols - 1));
 
-  if ((radius_y == 0) || (radius_x == 0) || (radius_y > 60) || (radius_x > 60)) {
+  if ((radius_y == 0) || (radius_x == 0) || (radius_y > 100) || (radius_x > 100)) {
     return code_hex_str;
   }
 

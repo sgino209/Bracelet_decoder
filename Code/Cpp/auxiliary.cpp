@@ -60,9 +60,11 @@ std::string decode_frame(args_t args) {
   }
 
   // Image enhancement:
-  imgEnhanced = image.clone();
   if (args.imgEnhancementEn) {
     imgEnhanced = imageEnhancement(image, 2, 8, 3, args.debugMode); //clahe_clipLimit=2, clahe_tileGridSize=8, gamme=3
+  }
+  else {
+    imgEnhanced = image.clone();
   }
   
   // Pre-processing (CSC --> contrast --> blur --> threshold):
@@ -92,6 +94,14 @@ std::string decode_frame(args_t args) {
                                        args.MinExtent,
                                        args.MaxExtent,
                                        args.MaxDrift,
+                                       args.PerspectiveMode,
+                                       args.FindContoursMode,
+                                       args.HoughParams.x1,
+                                       args.HoughParams.x2,
+                                       args.HoughParams.x3,
+                                       args.HoughParams.x4,
+                                       args.HoughParams.x5,
+                                       args.HoughParams.x6,
                                        args.debugMode);
 
   // Decode marks:
@@ -104,7 +114,7 @@ std::string decode_frame(args_t args) {
     
   if (args.debugMode) {
 
-    cv::imwrite("frame_orig.jpg", draw_roi(imgResized, args.ROI));
+    cv::imwrite("frame_orig.jpg", draw_roi(frame_orig, args.ROI));
     cv::imwrite("frame_gray.jpg", frame_gray);
     cv::imwrite("frame_thresh.jpg", frame_thresh);
   }
@@ -167,9 +177,9 @@ cv::Mat crop_roi_from_image(cv::Mat &frame, uint_x4_t roi) {
       double roiCx = roi.x1 + roiW / 2.0;
       double roiCy = roi.x2 + roiH / 2.0;
    
-      if (frame.dims == 2) {
-        cv::cvtColor(frame.clone(), frame, cv::COLOR_RGB2BGR);    
-      }
+      //if (frame.dims == 2) {
+      //  cv::cvtColor(frame.clone(), frame, cv::COLOR_RGB2BGR);    
+      //}
       cv::getRectSubPix(frame, 
                         cv::Size2f((float)roiW, (float)roiH),
                         cv::Point2f((float)roiCx, (float)roiCy),

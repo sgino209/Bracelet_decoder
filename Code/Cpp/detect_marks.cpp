@@ -5,7 +5,9 @@
 
 double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thresh, unsigned int MinPixelWidth, unsigned int MaxPixelWidth, 
                            unsigned int MinPixelHeight, unsigned int MaxPixelHeight, double MinAspectRatio, double MaxAspectRatio, 
-                           unsigned int MinPixelArea, unsigned int MaxPixelArea, double MinExtent, double MaxExtent, double MaxDrift, bool debugMode) {
+                           unsigned int MinPixelArea, unsigned int MaxPixelArea, double MinExtent, double MaxExtent, double MaxDrift,
+                           unsigned int PerspectiveMode, std::string FindContoursMode, unsigned int HoughParams1, unsigned int HoughParams2,
+                           unsigned int HoughParams3,unsigned int HoughParams4,unsigned int HoughParams5,unsigned int HoughParams6, bool debugMode) {
 
   char buffer[1000];
   double rotation_angle_deg;
@@ -15,7 +17,35 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
 
   // Find all contours in the image: 
   std::vector<std::vector<cv::Point>> contours;
-  cv::findContours(frame_thresh.clone(), contours, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
+
+  if (FindContoursMode == "Legacy") {
+    cv::findContours(frame_thresh.clone(), contours, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
+  }
+  else if (FindContoursMode == "Hough") {
+    
+    std::vector<cv::Vec3f> circles;
+    cv::HoughCircles(
+        frame_thresh.clone(),                    // 8-bit, single channel image
+        circles,                                 // detected circles (results)
+        cv::HOUGH_GRADIENT,                      // Defines the method to detect circles in images
+        (HoughParams1 > 0 ? HoughParams1 :  1),  // Large dp values -->  smaller accumulator array
+        (HoughParams2 > 0 ? HoughParams2 : 60),  // Min distance between the detected circles centers
+        (HoughParams3 > 0 ? HoughParams3 : 50),  // Gradient value used to handle edge detection
+        (HoughParams4 > 0 ? HoughParams4 : 18),  // Accumulator thresh val (smaller = more circles)
+        (HoughParams5 > 0 ? HoughParams5 : 20),  // Minimum size of the radius (in pixels)
+        (HoughParams6 > 0 ? HoughParams6 : 50)   // Maximum size of the radius (in pixels)
+    );
+
+    if (!circles.empty()) {
+      for (auto it = circles.begin(); it != circles.end(); it++) {
+        contours.push_back(circle_to_contour(*it, 50, 0.7));
+      }
+    }
+  }
+
+  else {
+    error("Unsupported FindContoursMode mode: " + FindContoursMode);
+  }
 
   // Foreach contour, check if it describes a possible character:
   cv::Mat frame_contours = cv::Mat::zeros(frame_thresh.size(), CV_8UC3);
@@ -59,7 +89,7 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
 
     // Perspective Alignment (Homography+PerspectiveWarp):
     possible_marks_final = possible_marks_wo_outliers;
-    perspective_alignment(possible_marks_final, rotation_angle_deg, debugMode);
+    perspective_alignment(possible_marks_final, PerspectiveMode, rotation_angle_deg, debugMode);
   }
 
   // -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
@@ -99,9 +129,15 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
     cv::putText(frame_possible_marks, "Rotation fix (SVD)", cv::Point(10, 70), cv::FONT_HERSHEY_SIMPLEX, 1, SCALAR_BLUE, 2);
     cv::putText(frame_possible_marks, "Centroid", cv::Point(10, 110), cv::FONT_HERSHEY_SIMPLEX, 1, SCALAR_GREEN, 2);
     cv::putText(frame_possible_marks, "Perspective fix", cv::Point(10, 150), cv::FONT_HERSHEY_SIMPLEX, 1, SCALAR_YELLOW, 2);
-        
-    X_xc = rotation_align.centroid_x;
-    X_yc = rotation_align.centroid_y;
+       
+    if (PerspectiveMode == 1) {
+        // place-holder (TBD: translate from Python):
+        //frame_possible_marks = polylines(frame_possible_marks, array([rect_src]), True, (255, 0, 0), 1, LINE_AA)
+        //frame_possible_marks = polylines(frame_possible_marks, array([rect_dst]), True, (0, 255, 255), 1, LINE_AA)
+    }
+
+    X_xc = std::max(3,int(rotation_align.centroid_x));
+    X_yc = std::max(3,int(rotation_align.centroid_y));
     for (ky=-3; ky<=3; ky++) {
       for (kx=-3; kx<=3; kx++) {
         frame_possible_marks.at<cv::Vec3b>(X_yc+ky,X_xc+kx)[1] = 255;
@@ -264,7 +300,22 @@ rotation_align_t rotation_alignment(mark_list_t &possible_marks_list, bool debug
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------
-void perspective_alignment(mark_list_t &possible_marks_list, double rotation_angle_deg, bool debugMode) {
+void perspective_alignment(mark_list_t &possible_marks_list, unsigned int PerspectiveMode, double rotation_angle_deg, bool debugMode) {
+
+    if (PerspectiveMode == 0) {
+        return perspective_alignment_opt0(possible_marks_list, rotation_angle_deg, debugMode);
+    }
+    else if (PerspectiveMode == 1) {
+        return perspective_alignment_opt1(possible_marks_list, debugMode);
+    }
+    else {
+        error("Invalid PerspectiveMode (%d)" + std::to_string(PerspectiveMode));
+    }
+}
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+
+void perspective_alignment_opt0(mark_list_t &possible_marks_list, double rotation_angle_deg, bool debugMode) {
   
   double mean_x = 0;
   unsigned int n = 1;
@@ -301,6 +352,32 @@ void perspective_alignment(mark_list_t &possible_marks_list, double rotation_ang
     debug("(xR,yR) after Perspective Fix:");
     print_mark_vec<PossibleMark>(possible_marks_list);
   }
+}
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+
+void perspective_alignment_opt1(mark_list_t &possible_marks_list, bool debugMode) {
+
+  error("PerspectiveMode=1 is Not supported at the moment in CPP edition");
+}
+
+// ------------------------------------------------------------------------------------------------------------------------------
+
+std::vector<cv::Point> circle_to_contour(cv::Vec3f circle, unsigned int points_per_contour, float resize_factor) {
+  
+  cv::Point center(round(circle[0]), round(circle[1]));
+  int xc = center.x;
+  int yc = center.y;
+  double r = cvRound(circle[2]);
+  r *= resize_factor;
+  std::vector<cv::Point> contour;
+  const double pi2 = 2*M_PI;
+  for (double i=0; i<pi2; i+=pi2/points_per_contour) {
+    int y = int(yc + r * sin(i));
+    int x = int(xc + r * cos(i));
+    contour.push_back(cv::Point(x,y));
+  }
+  return contour;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------

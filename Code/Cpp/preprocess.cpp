@@ -22,6 +22,8 @@ void preprocess(cv::Mat &imgOriginal, cv::Mat &imgGrayscale, cv::Mat &imgThresh,
     }
     
     // -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
+
+    cv::Mat imgBlurred;
     
     if (PreprocessMode == "Legacy") {
 
@@ -29,7 +31,6 @@ void preprocess(cv::Mat &imgOriginal, cv::Mat &imgGrayscale, cv::Mat &imgThresh,
         cv::Mat imgMaxContrastGrayscale = maximizeContrast(imgGrayscale, PreprocessMorphKernel);
 
         // Blurring:
-        cv::Mat imgBlurred;
         cv::Size gaussKernel;
         gaussKernel = cv::Size(PreprocessGaussKernel.x, PreprocessGaussKernel.y);
         cv::GaussianBlur(imgMaxContrastGrayscale, imgBlurred, gaussKernel, 0);
@@ -41,11 +42,10 @@ void preprocess(cv::Mat &imgOriginal, cv::Mat &imgGrayscale, cv::Mat &imgThresh,
     else if (PreprocessMode == "BlurAndCanny") {
         
         // Blurring:
-        cv::Mat imgBlurred;
         cv::medianBlur(imgGrayscale, imgBlurred, PreprocessMedianBlurKernel);
 
         // Canny Edge Detection:
-        cv::Canny(imgBlurred, imgThresh, PreprocessCannyThr/2, PreprocessCannyThr);
+        cv::Canny(imgBlurred, imgThresh, double(PreprocessCannyThr)/2, double(PreprocessCannyThr));
     }
 
     // -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
@@ -53,6 +53,8 @@ void preprocess(cv::Mat &imgOriginal, cv::Mat &imgGrayscale, cv::Mat &imgThresh,
     else {
         error("Unsupported PreprocessMode mode: " + PreprocessMode);
     }
+
+    imgGrayscale = imgBlurred;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------

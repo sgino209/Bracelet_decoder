@@ -16,12 +16,13 @@ int main(int argc, char** argv) {
   
   t0 = std::clock();
   printf("Start\n");
+  info("OpenCV version: " + std::string(CV_VERSION));
  
   args = load_default_args();
 
   while (iarg != -1)
   {
-    iarg = getopt_long(argc, argv, "i:vh", longopts, &index);
+    iarg = getopt_long(argc, argv, "hvi:", longopts, &index);
     
     switch (iarg) {
       case 'h':                            usage(argv[0]);  exit(0);                                       break;
