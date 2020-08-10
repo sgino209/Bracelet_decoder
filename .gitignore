@@ -133,3 +133,7 @@ dmypy.json
 .DS_Store
 results_*/
 Doc/PoC_demo.mov
+Database/260220_low/
+Database/260220_med/
+Database/260220_high/
+Releases/
