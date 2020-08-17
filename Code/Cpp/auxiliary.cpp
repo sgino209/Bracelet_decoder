@@ -157,10 +157,13 @@ std::string decode_frame(args_t args) {
   }
 
   double confidence = (maxVal - maxVal2) / double(sweep_space);
+  if (confidence < 0.1) {
+      code = "N/A";
+  }
   
   char buffer[1000];
   sprintf(buffer, "Confidence=%.2f", confidence);
-  info(buffer);
+  debug(buffer);
 
   return code.c_str();
 }
