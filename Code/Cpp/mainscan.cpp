@@ -25,38 +25,38 @@ int main(int argc, char** argv) {
     iarg = getopt_long(argc, argv, "hvi:", longopts, &index);
     
     switch (iarg) {
-      case 'h':                            usage(argv[0]);  exit(0);                                       break;
+      case 'h':                            usage(argv[0]);  exit(0);                                         break;
       case 'v':                            sprintf(buffer, "Bracelet_Decoder version: %s", bracelet_decoder_version );
                                            info(buffer); 
-                                           exit(0);                                                        break;
-      case 'i':                            if (optarg) { args.ImageFile = optarg;                       }  break;
-      case ARG_PREPROCESSCVCSEL:           if (optarg) { args.PreprocessCvcSel = optarg;                }  break;
-      case ARG_PREPROCESSMODE:             if (optarg) { args.PreprocessMode = optarg;                  }  break;
-      case ARG_PREPROCESSGAUSSKERNEL:      if (optarg) { set_xy(&args.PreprocessGaussKernel, optarg);   }  break;
-      case ARG_PREPROCESSTHRESHBLOCKSIZE:  if (optarg) { args.PreprocessThreshBlockSize = atoi(optarg); }  break;
-      case ARG_PREPROCESSTHRESHWEIGHT:     if (optarg) { args.PreprocessThreshweight = atoi(optarg);    }  break;
-      case ARG_PREPROCESSMORPHKERNEL:      if (optarg) { set_xy(&args.PreprocessMorphKernel, optarg);   }  break;
-      case ARG_PREPROCESSMEDIANBLURKERNEL: if (optarg) { args.PreprocessMedianBlurKernel = atoi(optarg);}  break;
-      case ARG_PREPROCESSCANNYTHR:         if (optarg) { args.PreprocessCannyThr = atoi(optarg);        }  break;
-      case ARG_IMGENHANCEMENTEN:           args.imgEnhancementEn = true;                                   break;
-      case ARG_MINPIXELWIDTH:              if (optarg) { args.MinPixelWidth = atoi(optarg);             }  break;
-      case ARG_MAXPIXELWIDTH:              if (optarg) { args.MaxPixelWidth = atoi(optarg);             }  break;
-      case ARG_MINPIXELHEIGHT:             if (optarg) { args.MinPixelHeight = atoi(optarg);            }  break;
-      case ARG_MAXPIXELHEIGHT:             if (optarg) { args.MaxPixelHeight = atoi(optarg);            }  break;
-      case ARG_MINASPECTRATIO:             if (optarg) { args.MinAspectRatio = atof(optarg);            }  break;
-      case ARG_MAXASPECTRATIO:             if (optarg) { args.MaxAspectRatio = atof(optarg);            }  break;
-      case ARG_MINPIXELAREA:               if (optarg) { args.MinPixelArea = atoi(optarg);              }  break;
-      case ARG_MAXPIXELAREA:               if (optarg) { args.MaxPixelArea = atoi(optarg);              }  break;
-      case ARG_MINEXTENT:                  if (optarg) { args.MinExtent = atof(optarg);                 }  break;
-      case ARG_MAXEXTENT:                  if (optarg) { args.MaxExtent = atof(optarg);                 }  break;
-      case ARG_MAXDRIFT:                   if (optarg) { args.MaxDrift = atof(optarg);                  }  break;
-      case ARG_MARKROWS:                   if (optarg) { args.MarksRows = atoi(optarg);                 }  break;
-      case ARG_MARKCOLS:                   if (optarg) { args.MarksCols = atoi(optarg);                 }  break;
-      case ARG_ROI:                        if (optarg) { set_x4(&args.ROI, optarg);                     }  break;
-      case ARG_FINDCONTOURSMODE:           if (optarg) { args.FindContoursMode = optarg;                }  break;
-      case ARG_HOUGHPARAMS:                if (optarg) { set_x6(&args.HoughParams, optarg);             }  break;
-      case ARG_PERSPECTIVEMODE:            if (optarg) { args.PerspectiveMode = atoi(optarg);           }  break;
-      case ARG_DEBUG:                      args.debugMode = true;                                          break;
+                                           exit(0);                                                          break;
+      case 'i':                            if (optarg) { args.ImageFile = optarg;                          } break;
+      case ARG_PREPROCESSCVCSEL:           if (optarg) { args.PreprocessCvcSel = optarg;                   } break;
+      case ARG_PREPROCESSMODE:             if (optarg) { args.PreprocessMode = optarg;                     } break;
+      case ARG_PREPROCESSGAUSSKERNEL:      if (optarg) { set_xy(&args.PreprocessGaussKernel, optarg);      } break;
+      case ARG_PREPROCESSTHRESHBLOCKSIZE:  if (optarg) { args.PreprocessThreshBlockSize = atoi(optarg);    } break;
+      case ARG_PREPROCESSTHRESHWEIGHT:     if (optarg) { args.PreprocessThreshweight = atoi(optarg);       } break;
+      case ARG_PREPROCESSMORPHKERNEL:      if (optarg) { set_xy(&args.PreprocessMorphKernel, optarg);      } break;
+      case ARG_PREPROCESSMEDIANBLURKERNEL: if (optarg) { set_xy(&args.PreprocessMedianBlurKernel, optarg); } break;
+      case ARG_PREPROCESSCANNYTHR:         if (optarg) { set_xy(&args.PreprocessCannyThr, optarg);         } break;
+      case ARG_IMGENHANCEMENTEN:           args.imgEnhancementEn = true;                                     break;
+      case ARG_MINPIXELWIDTH:              if (optarg) { args.MinPixelWidth = atoi(optarg);                } break;
+      case ARG_MAXPIXELWIDTH:              if (optarg) { args.MaxPixelWidth = atoi(optarg);                } break;
+      case ARG_MINPIXELHEIGHT:             if (optarg) { args.MinPixelHeight = atoi(optarg);               } break;
+      case ARG_MAXPIXELHEIGHT:             if (optarg) { args.MaxPixelHeight = atoi(optarg);               } break;
+      case ARG_MINASPECTRATIO:             if (optarg) { args.MinAspectRatio = atof(optarg);               } break;
+      case ARG_MAXASPECTRATIO:             if (optarg) { args.MaxAspectRatio = atof(optarg);               } break;
+      case ARG_MINPIXELAREA:               if (optarg) { args.MinPixelArea = atoi(optarg);                 } break;
+      case ARG_MAXPIXELAREA:               if (optarg) { args.MaxPixelArea = atoi(optarg);                 } break;
+      case ARG_MINEXTENT:                  if (optarg) { args.MinExtent = atof(optarg);                    } break;
+      case ARG_MAXEXTENT:                  if (optarg) { args.MaxExtent = atof(optarg);                    } break;
+      case ARG_MAXDRIFT:                   if (optarg) { args.MaxDrift = atof(optarg);                     } break;
+      case ARG_MARKROWS:                   if (optarg) { args.MarksRows = atoi(optarg);                    } break;
+      case ARG_MARKCOLS:                   if (optarg) { args.MarksCols = atoi(optarg);                    } break;
+      case ARG_ROI:                        if (optarg) { set_x4(&args.ROI, optarg);                        } break;
+      case ARG_FINDCONTOURSMODE:           if (optarg) { args.FindContoursMode = optarg;                   } break;
+      case ARG_HOUGHPARAMS:                if (optarg) { set_x6(&args.HoughParams, optarg);                } break;
+      case ARG_PERSPECTIVEMODE:            if (optarg) { args.PerspectiveMode = atoi(optarg);              } break;
+      case ARG_DEBUG:                      args.debugMode = true;                                            break;
     }
   }
   

@@ -4,6 +4,7 @@
 #ifndef AUXILIARY_HPP
 #define AUXILIARY_HPP
 
+#include <map>
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -43,8 +44,8 @@ typedef struct {
   unsigned int PreprocessThreshBlockSize;
   unsigned int PreprocessThreshweight;
   uint_xy_t PreprocessMorphKernel;
-  unsigned int PreprocessMedianBlurKernel;
-  unsigned int PreprocessCannyThr;
+  uint_xy_t PreprocessMedianBlurKernel;
+  uint_xy_t PreprocessCannyThr;
   unsigned int imgEnhancementEn;
   unsigned int MinPixelWidth;
   unsigned int MaxPixelWidth;

@@ -38,7 +38,9 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
 
     if (!circles.empty()) {
       for (auto it = circles.begin(); it != circles.end(); it++) {
-        contours.push_back(circle_to_contour(*it, 50, 0.7));
+        if (dist_to_closest_circle(*it, circles) < 140) {
+          contours.push_back(circle_to_contour(*it, 50, 0.7));
+        }
       }
     }
   }
@@ -153,7 +155,7 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
     sprintf(buffer, "Rotation: %.2f", rotation_angle_deg);
     debug(buffer);
     cv::imwrite("img_contours_all.jpg", frame_contours);
-    cv::imwrite("img_possible_marks_.jpg", frame_possible_marks);
+    cv::imwrite("img_possible_marks.jpg", frame_possible_marks);
   } 
 
   return rotation_angle_deg;
@@ -378,6 +380,30 @@ std::vector<cv::Point> circle_to_contour(cv::Vec3f circle, unsigned int points_p
     contour.push_back(cv::Point(x,y));
   }
   return contour;
+}
+
+// ------------------------------------------------------------------------------------------------------------------------------
+
+unsigned int dist_to_closest_circle(cv::Vec3f circle, std::vector<cv::Vec3f> circles) {
+  
+  unsigned int dist_min = std::numeric_limits<int>::max();
+  
+  int xc = round(circle[0]);
+  int yc = round(circle[1]);
+
+  for (auto it = circles.begin(); it != circles.end(); it++) {
+    int xcc = round((*it)[0]);
+    int ycc = round((*it)[1]);
+    if ((xcc == xc) && (ycc == yc)) {
+        continue;
+    }
+    unsigned int dist = std::sqrt(std::pow(xcc-xc,2) + std::pow(ycc-yc,2));
+    if (dist < dist_min) {
+      dist_min = dist;
+    }
+  }
+
+  return dist_min;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------

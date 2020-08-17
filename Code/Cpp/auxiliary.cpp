@@ -5,14 +5,15 @@
 #include "preprocess.hpp"
 
 extern void preprocess(cv::Mat &imgOriginal, cv::Mat &imgGrayscale, cv::Mat &imgThresh, uint_xy_t PreprocessGaussKernel, 
-                       unsigned int PreprocessThreshBlockSize, unsigned int PreprocessThreshweight, uint_xy_t PreprocessMorphKernel);
+                       unsigned int PreprocessThreshBlockSize, unsigned int PreprocessThreshweight, uint_xy_t PreprocessMorphKernel,
+                       unsigned int PreprocessMedianBlurKernel, unsigned int PreprocessCannyThr);
 
 extern void set_xy(uint_xy_t *d, std::string str);
 extern void set_x4(uint_x4_t *d, std::string str);
 extern void set_x6(uint_x6_t *d, std::string str);
 
 std::string decode_frame(args_t args) {
-
+    
   std::string code;
   double rotation_angle;
   mark_list_t possible_marks;
@@ -66,58 +67,100 @@ std::string decode_frame(args_t args) {
   else {
     imgEnhanced = image.clone();
   }
-  
-  // Pre-processing (CSC --> contrast --> blur --> threshold):
-  preprocess(imgEnhanced,
-             frame_gray,
-             frame_thresh,
-             args.PreprocessCvcSel,
-             args.PreprocessMode,
-             args.PreprocessGaussKernel,
-             args.PreprocessThreshBlockSize,
-             args.PreprocessThreshweight,
-             args.PreprocessMorphKernel,
-             args.PreprocessMedianBlurKernel,
-             args.PreprocessCannyThr);
 
-  // Find bracelet marks:
-  rotation_angle = find_possible_marks(possible_marks,
-                                       frame_thresh,
-                                       args.MinPixelWidth,
-                                       args.MaxPixelWidth,
-                                       args.MinPixelHeight,
-                                       args.MaxPixelHeight,
-                                       args.MinAspectRatio,
-                                       args.MaxAspectRatio,
-                                       args.MinPixelArea,
-                                       args.MaxPixelArea,
-                                       args.MinExtent,
-                                       args.MaxExtent,
-                                       args.MaxDrift,
-                                       args.PerspectiveMode,
-                                       args.FindContoursMode,
-                                       args.HoughParams.x1,
-                                       args.HoughParams.x2,
-                                       args.HoughParams.x3,
-                                       args.HoughParams.x4,
-                                       args.HoughParams.x5,
-                                       args.HoughParams.x6,
-                                       args.debugMode);
+  unsigned int sweep_space = 0;
+  std::map<std::string,unsigned int> scoreboard_winners;
 
-  // Decode marks:
-  code = decode_marks(possible_marks,
-                      args.MarksRows,
-                      args.MarksCols,
-                      frame_thresh.size(),
-                      rotation_angle,
-                      args.debugMode);
-    
-  if (args.debugMode) {
+  for (unsigned int MedianBlurKernel=args.PreprocessMedianBlurKernel.x; MedianBlurKernel<=args.PreprocessMedianBlurKernel.y; MedianBlurKernel+=2) {
+    for (unsigned int CannyThr=args.PreprocessCannyThr.x; CannyThr<=args.PreprocessCannyThr.y; CannyThr+=10) {
+        
+      // Pre-processing (CSC --> contrast --> blur --> threshold):
+      preprocess(imgEnhanced,
+                 frame_gray,
+                 frame_thresh,
+                 args.PreprocessCvcSel,
+                 args.PreprocessMode,
+                 args.PreprocessGaussKernel,
+                 args.PreprocessThreshBlockSize,
+                 args.PreprocessThreshweight,
+                 args.PreprocessMorphKernel,
+                 MedianBlurKernel,
+                 CannyThr);
 
-    cv::imwrite("frame_orig.jpg", draw_roi(frame_orig, args.ROI));
-    cv::imwrite("frame_gray.jpg", frame_gray);
-    cv::imwrite("frame_thresh.jpg", frame_thresh);
+      // Find bracelet marks:
+      rotation_angle = find_possible_marks(possible_marks,
+                                           frame_thresh,
+                                           args.MinPixelWidth,
+                                           args.MaxPixelWidth,
+                                           args.MinPixelHeight,
+                                           args.MaxPixelHeight,
+                                           args.MinAspectRatio,
+                                           args.MaxAspectRatio,
+                                           args.MinPixelArea,
+                                           args.MaxPixelArea,
+                                           args.MinExtent,
+                                           args.MaxExtent,
+                                           args.MaxDrift,
+                                           args.PerspectiveMode,
+                                           args.FindContoursMode,
+                                           args.HoughParams.x1,
+                                           args.HoughParams.x2,
+                                           args.HoughParams.x3,
+                                           args.HoughParams.x4,
+                                           args.HoughParams.x5,
+                                           args.HoughParams.x6,
+                                           args.debugMode);
+
+      // Decode marks:
+      code = decode_marks(possible_marks,
+                          args.MarksRows,
+                          args.MarksCols,
+                          frame_thresh.size(),
+                          rotation_angle,
+                          args.debugMode);
+        
+      if (args.debugMode) {
+
+        cv::imwrite("frame_orig.jpg", draw_roi(frame_orig, args.ROI));
+        cv::imwrite("frame_gray.jpg", frame_gray);
+        cv::imwrite("frame_thresh.jpg", frame_thresh);
+      }
+     
+      if (code != "N/A") {
+                      
+        if (scoreboard_winners.find(code) == scoreboard_winners.end()) {
+          scoreboard_winners[code] = 1;
+        }
+        else {
+          scoreboard_winners[code]++;
+        }
+        sweep_space++;
+      
+        if (args.debugMode) {
+          char buffer[1000];
+          sprintf(buffer, "MedianBlurKernel=%d, CannyThr=%d, code=%s", MedianBlurKernel, CannyThr, code.c_str());
+          debug(buffer);
+        }
+      }  
+    }
   }
+        
+  unsigned int maxVal = 0;
+  unsigned int maxVal2 = 0;
+  for (auto it = scoreboard_winners.begin(); it != scoreboard_winners.end(); ++it) {
+      std::cout << it->first << " --> " << it->second << std::endl;
+      if (it->second > maxVal) {
+        maxVal2 = maxVal;
+        maxVal = it->second;
+        code = it->first;
+      }
+  }
+
+  double confidence = (maxVal - maxVal2) / double(sweep_space);
+  
+  char buffer[1000];
+  sprintf(buffer, "Confidence=%.2f", confidence);
+  info(buffer);
 
   return code.c_str();
 }
@@ -212,8 +255,8 @@ args_t load_default_args() {
   args.PreprocessThreshBlockSize = 19;
   args.PreprocessThreshweight = 7;
   set_xy(&args.PreprocessMorphKernel, "(3,3)");
-  args.PreprocessMedianBlurKernel = 13;
-  args.PreprocessCannyThr = 80;
+  set_xy(&args.PreprocessMedianBlurKernel, "(13,13)");
+  set_xy(&args.PreprocessCannyThr, "(80,80)");
   args.imgEnhancementEn = false;
   args.MinPixelWidth = 7;
   args.MaxPixelWidth = 30;
@@ -247,8 +290,8 @@ void print_args(args_t args) {
   printf("args.PreprocessThreshBlockSize = %d\n", args.PreprocessThreshBlockSize);
   printf("args.PreprocessThreshweight = %d\n", args.PreprocessThreshweight);
   printf("args.PreprocessMorphKernel = (%d,%d)\n", args.PreprocessMorphKernel.x, args.PreprocessMorphKernel.y);
-  printf("args.PreprocessMedianBlurKernel = %d\n", args.PreprocessMedianBlurKernel);
-  printf("args.PreprocessCannyThr = %d\n", args.PreprocessCannyThr);
+  printf("args.PreprocessMedianBlurKernel = (%d,%d)\n", args.PreprocessMedianBlurKernel.x, args.PreprocessMedianBlurKernel.y);
+  printf("args.PreprocessCannyThr = (%d,%d)\n", args.PreprocessCannyThr.x, args.PreprocessCannyThr.y);
   printf("args.imgEnhancementEn = %d\n", args.imgEnhancementEn);
   printf("args.MinPixelWidth = %d\n", args.MinPixelWidth);
   printf("args.MaxPixelWidth = %d\n", args.MaxPixelWidth);

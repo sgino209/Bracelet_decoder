@@ -45,6 +45,9 @@ void perspective_alignment_opt1(mark_list_t &possible_marks_list, bool debugMode
 // Auxiliary function - Gets a Circle (x,y,radius) and returns the corresponding contour (array of x,y points)
 std::vector<cv::Point> circle_to_contour(cv::Vec3f circle, unsigned int points_per_contour, float resize_factor);
 
+// Auxiliary function - Gets a Circle (x,y,radius) and a vector of Circles, and return minimal distance
+unsigned int dist_to_closest_circle(cv::Vec3f circle, std::vector<cv::Vec3f> circles);
+
 // Auxiliary function - calculates median for a given vector:
 template <class T>
 double median_calc(std::vector<T> data_vec);
