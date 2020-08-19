@@ -3,7 +3,7 @@
 
 #include "decode_marks.hpp"
 
-std::string decode_marks(mark_list_t marks_list, unsigned int MarksRows, unsigned int MarksCols, cv::Size frame_shape, double rotation_angle_deg, bool debugMode) {
+std::string decode_marks(mark_list_t marks_list, unsigned int MarksRows, unsigned int MarksCols, cv::Size frame_shape, double rotation_angle_deg, bool debugMode, std::map<std::string,cv::Mat>* debug_imgs) {
 
   char buffer[1000];
   std::string code_hex_str = "N/A";
@@ -114,7 +114,7 @@ std::string decode_marks(mark_list_t marks_list, unsigned int MarksRows, unsigne
   // -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
 
   // Debug:
-  if (debugMode) {
+  if (debugMode || debug_imgs) {
   
     int height = frame_shape.height;
     int width = frame_shape.width;
@@ -148,7 +148,13 @@ std::string decode_marks(mark_list_t marks_list, unsigned int MarksRows, unsigne
     cv::putText(aligned_frame, "Original", cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 1, SCALAR_RED, 2);
     cv::putText(aligned_frame, "Rotation fix (SVD)", cv::Point(10, 70), cv::FONT_HERSHEY_SIMPLEX, 1, SCALAR_BLUE, 2);
     cv::putText(aligned_frame, "KNN origins", cv::Point(10, 110), cv::FONT_HERSHEY_SIMPLEX, 1, SCALAR_GREEN, 2);
-    cv::imwrite("img_possible_marks_aligned.jpg", aligned_frame);
+    if (debugMode) {
+      cv::imwrite("img_possible_marks_aligned.jpg", aligned_frame);
+    }
+  
+    if (debug_imgs) {
+      (*debug_imgs)["img_possible_marks_aligned"] = aligned_frame;
+    }
   }
 
   return code_hex_str;

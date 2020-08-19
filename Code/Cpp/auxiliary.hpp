@@ -67,7 +67,15 @@ typedef struct {
   bool debugMode;
 } args_t;
 
+typedef struct {
+  std::string code;
+  double confidence;
+  args_t args;
+  std::map<std::string,cv::Mat> debug_imgs;
+} decoder_res_t;
+
 std::string decode_frame(args_t args);
+decoder_res_t decode_frame_new(args_t args);
 
 class PossibleMark;
 

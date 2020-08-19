@@ -16,7 +16,7 @@ class PossibleMark;
 typedef std::vector<PossibleMark> mark_list_t;
 
 // Marks decoding, based on marks positioning:
-std::string decode_marks(mark_list_t marks_list, unsigned int MarksRows, unsigned int MarksCols, cv::Size frame_shape, double rotation_angle_deg, bool debugMode);
+std::string decode_marks(mark_list_t marks_list, unsigned int MarksRows, unsigned int MarksCols, cv::Size frame_shape, double rotation_angle_deg, bool debugMode, std::map<std::string,cv::Mat>* debug_imgs=nullptr);
 
 // Auxiliary function - Seek for a mark existence in a WxH neighbourhood around (x,y) coordinate:
 int seek_for_mark(unsigned int x, unsigned int y, mark_list_t marks, unsigned int w, unsigned int h);

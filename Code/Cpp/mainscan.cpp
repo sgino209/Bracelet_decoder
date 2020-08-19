@@ -9,6 +9,7 @@ int main(int argc, char** argv) {
   
   int index, iarg = 0;
   args_t args;
+  decoder_res_t decoder_res;
   std::clock_t t0,t1;
   double t_elapsed_sec;
   char buffer[1000];
@@ -77,10 +78,12 @@ int main(int argc, char** argv) {
   }
 
   // Frame Docoder (algo):
-  code = decode_frame(args);
+  // code = decode_frame(args);
+  decoder_res = decode_frame_new(args);
+  code = decoder_res.code;
 
   info("Code = " + code);
-
+  
   t1 = std::clock();
   t_elapsed_sec = (t1 - t0) / (double)CLOCKS_PER_SEC;
   std::cout << "Done! (" << std::setprecision(2) << t_elapsed_sec << " sec)" << std::endl;

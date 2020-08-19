@@ -29,7 +29,8 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
                            unsigned int MinPixelHeight, unsigned int MaxPixelHeight, double MinAspectRatio, double MaxAspectRatio, 
                            unsigned int MinPixelArea, unsigned int MaxPixelArea, double MinExtent, double MaxExtent, double MaxDrift,
                            unsigned int PerspectiveMode, std::string FindContoursMode, unsigned int HoughParams1, unsigned int HoughParams2,
-                           unsigned int HoughParams3,unsigned int HoughParams4,unsigned int HoughParams5,unsigned int HoughParams6, bool debugMode);
+                           unsigned int HoughParams3,unsigned int HoughParams4,unsigned int HoughParams5,unsigned int HoughParams6, bool debugMode, 
+                           std::map<std::string,cv::Mat>* debug_imgs=nullptr);
 
 // Remove outliers in a given 2D data-set of possible-marks
 mark_list_t remove_outliers(mark_list_t possible_marks_list, double MaxDrift, bool debugMode);

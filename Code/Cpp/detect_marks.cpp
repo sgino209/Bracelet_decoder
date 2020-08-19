@@ -7,7 +7,8 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
                            unsigned int MinPixelHeight, unsigned int MaxPixelHeight, double MinAspectRatio, double MaxAspectRatio, 
                            unsigned int MinPixelArea, unsigned int MaxPixelArea, double MinExtent, double MaxExtent, double MaxDrift,
                            unsigned int PerspectiveMode, std::string FindContoursMode, unsigned int HoughParams1, unsigned int HoughParams2,
-                           unsigned int HoughParams3,unsigned int HoughParams4,unsigned int HoughParams5,unsigned int HoughParams6, bool debugMode) {
+                           unsigned int HoughParams3,unsigned int HoughParams4,unsigned int HoughParams5,unsigned int HoughParams6, bool debugMode,
+                           std::map<std::string,cv::Mat>* debug_imgs) {
 
   char buffer[1000];
   double rotation_angle_deg;
@@ -96,7 +97,7 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
 
   // -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- ..
 
-  if (debugMode) {
+  if (debugMode || debug_imgs) {
 
     int kx, ky;
     unsigned int X_xc, X_yc;
@@ -146,16 +147,23 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
       }
     }
 
-    sprintf(buffer, "Amount of detected contours: %d", contours.size());
-    debug(buffer);
-    sprintf(buffer, "Amount of possible marks: %d", possible_marks_cntr);
-    debug(buffer);
-    sprintf(buffer, "Amount of possible marks w/o outliers: %d", possible_marks_wo_outliers.size());
-    debug(buffer);
-    sprintf(buffer, "Rotation: %.2f", rotation_angle_deg);
-    debug(buffer);
-    cv::imwrite("img_contours_all.jpg", frame_contours);
-    cv::imwrite("img_possible_marks.jpg", frame_possible_marks);
+    if (debugMode) {
+      sprintf(buffer, "Amount of detected contours: %d", contours.size());
+      debug(buffer);
+      sprintf(buffer, "Amount of possible marks: %d", possible_marks_cntr);
+      debug(buffer);
+      sprintf(buffer, "Amount of possible marks w/o outliers: %d", possible_marks_wo_outliers.size());
+      debug(buffer);
+      sprintf(buffer, "Rotation: %.2f", rotation_angle_deg);
+      debug(buffer);
+      cv::imwrite("img_contours_all.jpg", frame_contours);
+      cv::imwrite("img_possible_marks.jpg", frame_possible_marks);
+    } 
+
+    if (debug_imgs) {
+      (*debug_imgs)["img_contours_all"] = frame_contours;
+      (*debug_imgs)["img_possible_marks"] = frame_possible_marks;
+    }
   } 
 
   return rotation_angle_deg;

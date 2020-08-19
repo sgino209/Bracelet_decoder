@@ -12,8 +12,9 @@ extern void set_xy(uint_xy_t *d, std::string str);
 extern void set_x4(uint_x4_t *d, std::string str);
 extern void set_x6(uint_x6_t *d, std::string str);
 
-std::string decode_frame(args_t args) {
-    
+decoder_res_t decode_frame_new(args_t args) {
+
+  decoder_res_t res;
   std::string code;
   double rotation_angle;
   mark_list_t possible_marks;
@@ -109,7 +110,8 @@ std::string decode_frame(args_t args) {
                                            args.HoughParams.x4,
                                            args.HoughParams.x5,
                                            args.HoughParams.x6,
-                                           args.debugMode);
+                                           args.debugMode,
+                                           &res.debug_imgs);
 
       // Decode marks:
       code = decode_marks(possible_marks,
@@ -117,7 +119,8 @@ std::string decode_frame(args_t args) {
                           args.MarksCols,
                           frame_thresh.size(),
                           rotation_angle,
-                          args.debugMode);
+                          args.debugMode,
+                          &res.debug_imgs);
         
       if (args.debugMode) {
 
@@ -148,33 +151,47 @@ std::string decode_frame(args_t args) {
   unsigned int maxVal = 0;
   unsigned int maxVal2 = 0;
   for (auto it = scoreboard_winners.begin(); it != scoreboard_winners.end(); ++it) {
-      std::cout << it->first << " --> " << it->second << std::endl;
-      if (it->second > maxVal) {
-        maxVal2 = maxVal;
-        maxVal = it->second;
-        code = it->first;
-      }
+    std::cout << it->first << " --> " << it->second << std::endl;
+    if (it->second > maxVal) {
+      maxVal2 = maxVal;
+      maxVal = it->second;
+      code = it->first;
+    }
   }
 
   double confidence = (maxVal - maxVal2) / double(sweep_space);
   if (confidence < 0.1) {
-      code = "N/A";
+    code = "N/A";
   }
   
   char buffer[1000];
   sprintf(buffer, "Confidence=%.2f", confidence);
   debug(buffer);
 
-  return code.c_str();
+  res.code = code;
+  res.confidence = confidence;
+  res.args = args;
+  res.debug_imgs["frame_orig"] = draw_roi(frame_orig, args.ROI);
+  res.debug_imgs["frame_gray"] = frame_gray;
+  res.debug_imgs["frame_thresh"] = frame_thresh;
+
+  return res;
+}
+
+// ------------------------------------------------------------------------------------------------------------------------------
+
+std::string decode_frame(args_t args) {
+
+  return decode_frame_new(args).code.c_str();
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------
 void generic_message(std::string message, std::string severity) {
     
-    char buffer[1000];
-    sprintf(buffer, "%s: %s", severity.c_str(), message.c_str());
-    
-    std::cout << buffer << std::endl << std::flush;
+  char buffer[1000];
+  sprintf(buffer, "%s: %s", severity.c_str(), message.c_str());
+  
+  std::cout << buffer << std::endl << std::flush;
 }
 
 void info(std::string message)  { generic_message(message, "INFO");  }
@@ -196,8 +213,8 @@ cv::Mat draw_roi(cv::Mat &frame, uint_x4_t roi) {
     y2 = (roi.len == 4) ? roi.x4 : roi.x3;
   }
   else if (roi.x1 == 0) {
-      x2 = imgW;
-      y2 = imgH;
+    x2 = imgW;
+    y2 = imgH;
   }
 
   cv::rectangle(frame, cv::Rect(x1, y1, x2, y2), SCALAR_RED, 2);
@@ -243,7 +260,7 @@ cv::Mat crop_roi_from_image(cv::Mat &frame, uint_x4_t roi) {
 // Auxiliary function for a MSE calculation
 double distance_mse(cv::Point2f p1, cv::Point2f p2) {
 
-    return (double)(sqrt(pow((p1.x - p2.x),2) + pow((p1.y - p2.y),2)));
+  return (double)(sqrt(pow((p1.x - p2.x),2) + pow((p1.y - p2.y),2)));
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------
