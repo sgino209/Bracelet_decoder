@@ -112,8 +112,14 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
       cv::drawContours(frame_possible_marks, contours, 0, SCALAR_WHITE);
       for (ky=-3; ky<=3; ky++) {
         for (kx=-3; kx<=3; kx++) {
-          frame_possible_marks.at<cv::Vec3b>(it->intCenterY+ky,it->intCenterX+kx)[2] = 255;
-          frame_possible_marks.at<cv::Vec3b>(it->intCenterY_r+ky,it->intCenterX_r+kx)[0] = 255;
+          if ((it->intCenterY+ky >= 0) && (it->intCenterY+ky < frame_thresh.size().height) &&
+              (it->intCenterX+kx >= 0) && (it->intCenterX+kx < frame_thresh.size().width)) {
+            frame_possible_marks.at<cv::Vec3b>(it->intCenterY+ky,it->intCenterX+kx)[2] = 255;
+          }
+          if ((it->intCenterY_r+ky >= 0) && (it->intCenterY_r+ky < frame_thresh.size().height) &&
+              (it->intCenterX_r+kx >= 0) && (it->intCenterX_r+kx < frame_thresh.size().width)) {
+            frame_possible_marks.at<cv::Vec3b>(it->intCenterY_r+ky,it->intCenterX_r+kx)[0] = 255;
+          }
         }
       }
     }
@@ -122,8 +128,11 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
       
       for (ky=-3; ky<=3; ky++) {
         for (kx=-3; kx<=3; kx++) {
-          frame_possible_marks.at<cv::Vec3b>(it->intCenterY_r+ky,it->intCenterX_r+kx)[1] = 255;
-          frame_possible_marks.at<cv::Vec3b>(it->intCenterY_r+ky,it->intCenterX_r+kx)[2] = 255;
+          if ((it->intCenterY_r+ky >= 0) && (it->intCenterY_r+ky < frame_thresh.size().height) &&
+              (it->intCenterX_r+kx >= 0) && (it->intCenterX_r+kx < frame_thresh.size().width)) {
+            frame_possible_marks.at<cv::Vec3b>(it->intCenterY_r+ky,it->intCenterX_r+kx)[1] = 255;
+            frame_possible_marks.at<cv::Vec3b>(it->intCenterY_r+ky,it->intCenterX_r+kx)[2] = 255;
+          }
         }
       }
     }
