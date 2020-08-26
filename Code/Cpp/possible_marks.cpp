@@ -29,10 +29,13 @@ PossibleMark :: PossibleMark(std::vector<cv::Point> _contour, cv::Mat &frame_gra
   int kx, ky, kn=0;
   for (ky=-5; ky<=5; ky++) {
     for (kx=-5; kx<=5; kx++) {
-      dblTexture += frame_gray.at<uchar>(intCenterY+ky, intCenterX+kx);
-      kn++;
-      if (debugMode) {
-        frame_gray.at<uchar>(intCenterY+ky,intCenterX+kx) = 255;
+      if ((intCenterY+ky >= 0) && (intCenterY+ky < frame_gray.size().height) &&
+          (intCenterX+kx >= 0) && (intCenterX+kx < frame_gray.size().width)) {
+        dblTexture += frame_gray.at<uchar>(intCenterY+ky, intCenterX+kx);
+        kn++;
+        if (debugMode) {
+          frame_gray.at<uchar>(intCenterY+ky,intCenterX+kx) = 255;
+        }
       }
     }
   }
