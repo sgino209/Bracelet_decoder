@@ -87,6 +87,11 @@ decoder_res_t decode_frame_new(args_t args) {
                  args.PreprocessMorphKernel,
                  MedianBlurKernel,
                  CannyThr);
+  
+      res.args = args;
+      res.debug_imgs["frame_orig"] = draw_roi(frame_orig, args.ROI);
+      res.debug_imgs["frame_gray"] = frame_gray;
+      res.debug_imgs["frame_thresh"] = frame_thresh;
 
       // Find bracelet marks:
       rotation_angle = find_possible_marks(possible_marks,
@@ -170,10 +175,6 @@ decoder_res_t decode_frame_new(args_t args) {
 
   res.code = code;
   res.confidence = confidence;
-  res.args = args;
-  res.debug_imgs["frame_orig"] = draw_roi(frame_orig, args.ROI);
-  res.debug_imgs["frame_gray"] = frame_gray;
-  res.debug_imgs["frame_thresh"] = frame_thresh;
 
   return res;
 }
