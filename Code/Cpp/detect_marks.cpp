@@ -3,12 +3,12 @@
 
 #include "detect_marks.hpp"
 
-double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thresh, unsigned int MinPixelWidth, unsigned int MaxPixelWidth, 
-                           unsigned int MinPixelHeight, unsigned int MaxPixelHeight, double MinAspectRatio, double MaxAspectRatio, 
-                           unsigned int MinPixelArea, unsigned int MaxPixelArea, double MinExtent, double MaxExtent, double MaxDrift,
-                           unsigned int PerspectiveMode, std::string FindContoursMode, unsigned int HoughParams1, unsigned int HoughParams2,
-                           unsigned int HoughParams3,unsigned int HoughParams4,unsigned int HoughParams5,unsigned int HoughParams6, bool debugMode,
-                           std::map<std::string,cv::Mat>* debug_imgs) {
+double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_gray, cv::Mat &frame_thresh, unsigned int MinPixelWidth, 
+                           unsigned int MaxPixelWidth, unsigned int MinPixelHeight, unsigned int MaxPixelHeight, double MinAspectRatio,
+                           double MaxAspectRatio, unsigned int MinPixelArea, unsigned int MaxPixelArea, double MinExtent, double MaxExtent, 
+                           double MinTexture, double MaxTexture, double MaxDrift, unsigned int PerspectiveMode, std::string FindContoursMode,
+                           unsigned int HoughParams1, unsigned int HoughParams2, unsigned int HoughParams3,unsigned int HoughParams4,
+                           unsigned int HoughParams5, unsigned int HoughParams6, bool debugMode, std::map<std::string,cv::Mat>* debug_imgs) {
 
   char buffer[1000];
   double rotation_angle_deg;
@@ -39,9 +39,7 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
 
     if (!circles.empty()) {
       for (auto it = circles.begin(); it != circles.end(); it++) {
-        if (dist_to_closest_circle(*it, circles) < 140) {
-          contours.push_back(circle_to_contour(*it, 50, 0.7));
-        }
+        contours.push_back(circle_to_contour(*it, 50, 0.7));
       }
     }
   }
@@ -55,12 +53,14 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
   for (unsigned int i = 0; i < contours.size(); i++) {
 
     // Register the contour as a possible character (+calculate intrinsic metrics):
-    PossibleMark possible_mark = PossibleMark(contours[i],
+    PossibleMark possible_mark = PossibleMark(contours[i], frame_gray,
                                               MinPixelWidth, MaxPixelWidth,
                                               MinPixelHeight, MaxPixelHeight,
                                               MinAspectRatio, MaxAspectRatio,
                                               MinPixelArea, MaxPixelArea,
-                                              MinExtent, MaxExtent);
+                                              MinExtent, MaxExtent,
+                                              MinTexture, MaxTexture,
+                                              debugMode);
 
     // If contour is a possible char, increment count of possible chars and add to list of possible chars:
     if (possible_mark.checkIfPossibleMark()) {
@@ -68,7 +68,7 @@ double find_possible_marks(mark_list_t &possible_marks_final, cv::Mat &frame_thr
       possible_marks_list.push_back(possible_mark);
     }
 
-    if (debugMode) {
+    if (debugMode || debug_imgs) {
       cv::drawContours(frame_contours, contours, i, SCALAR_WHITE);
     }
   }
@@ -397,30 +397,6 @@ std::vector<cv::Point> circle_to_contour(cv::Vec3f circle, unsigned int points_p
     contour.push_back(cv::Point(x,y));
   }
   return contour;
-}
-
-// ------------------------------------------------------------------------------------------------------------------------------
-
-unsigned int dist_to_closest_circle(cv::Vec3f circle, std::vector<cv::Vec3f> circles) {
-  
-  unsigned int dist_min = std::numeric_limits<int>::max();
-  
-  int xc = round(circle[0]);
-  int yc = round(circle[1]);
-
-  for (auto it = circles.begin(); it != circles.end(); it++) {
-    int xcc = round((*it)[0]);
-    int ycc = round((*it)[1]);
-    if ((xcc == xc) && (ycc == yc)) {
-        continue;
-    }
-    unsigned int dist = std::sqrt(std::pow(xcc-xc,2) + std::pow(ycc-yc,2));
-    if (dist < dist_min) {
-      dist_min = dist;
-    }
-  }
-
-  return dist_min;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------

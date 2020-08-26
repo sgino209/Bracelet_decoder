@@ -24,6 +24,7 @@ public:
   int intCenterY_r;
   double dblDiagonalSize;
   double dblAspectRatio;
+  double dblTexture;
   unsigned int MinPixelWidth;
   unsigned int MaxPixelWidth;
   unsigned int MinPixelHeight;
@@ -35,12 +36,15 @@ public:
   double dblExtent;
   double MinExtent;
   double MaxExtent;
+  double MinTexture;
+  double MaxTexture;
 
   // -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. --
   // Constructor
-  PossibleMark(std::vector<cv::Point> _contour, unsigned int _MinPixelWidth, unsigned int _MaxPixelWidth,
+  PossibleMark(std::vector<cv::Point> _contour, cv::Mat &frame_gray, unsigned int _MinPixelWidth, unsigned int _MaxPixelWidth,
                unsigned int _MinPixelHeight, unsigned int _MaxPixelHeight, double _MinAspectRatio, double _MaxAspectRatio,
-               unsigned int _MinPixelArea, unsigned int _MaxPixelArea, double _MinExtent, double _MaxExtent);
+               unsigned int _MinPixelArea, unsigned int _MaxPixelArea, double _MinExtent, double _MaxExtent, double MinTexture, 
+               double MaxTexture, bool debugMode);
     
   // -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. -- .. --
   // A 'first pass' over the contour, to see if it could be representing a character

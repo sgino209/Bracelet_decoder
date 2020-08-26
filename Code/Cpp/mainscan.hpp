@@ -110,6 +110,8 @@ typedef enum {
   ARG_PERSPECTIVEMODE,
   ARG_MINEXTENT,
   ARG_MAXEXTENT,
+  ARG_MINTEXTURE,
+  ARG_MAXTEXTURE,
   ARG_DEBUG,
   ARGS_NUM
 } bracelet_decoder_arg_t;
@@ -138,6 +140,8 @@ const struct option longopts[] =
   {"MaxPixelArea",               required_argument, 0, ARG_MAXPIXELAREA },
   {"MinExtent",                  required_argument, 0, ARG_MINEXTENT },
   {"MaxExtent",                  required_argument, 0, ARG_MAXEXTENT },
+  {"MinTexture",                 required_argument, 0, ARG_MINTEXTURE },
+  {"MaxTexture",                 required_argument, 0, ARG_MAXTEXTURE },
   {"MaxDrift",                   required_argument, 0, ARG_MAXDRIFT },
   {"MarksRows",                  required_argument, 0, ARG_MARKROWS },
   {"MarksCols",                  required_argument, 0, ARG_MARKCOLS },

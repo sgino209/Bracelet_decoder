@@ -36,13 +36,14 @@ decoder_res_t decode_frame_new(args_t args) {
   cv::Size s = frame_orig.size();
   cv::Size resizingVec;
   if (args.PreprocessMode == "Legacy") {
-      resizingVec = resizingVec1;
-      if (s.width < s.height) {
-          resizingVec = resizingVec2;
-      }
+    resizingVec = resizingVec1;
+    if (s.width < s.height) {
+      resizingVec = resizingVec2;
+    }
   }
   else if (args.PreprocessMode == "BlurAndCanny") {
-      resizingVec = resizingVec3;
+    //resizingVec = resizingVec3;
+    resizingVec = resizingVec4;
   }
   else {
       error("Unsupported PreprocessMode mode: " + args.PreprocessMode);
@@ -51,14 +52,14 @@ decoder_res_t decode_frame_new(args_t args) {
   // Resizing and ROI cropping:
   cv::Mat image;
   if (args.PreprocessMode == "Legacy") {
-      cv::resize(frame_orig.clone(), imgResized, resizingVec);
-      imgCropped = crop_roi_from_image(imgResized, args.ROI);
-      image = imgCropped;
+    cv::resize(frame_orig.clone(), imgResized, resizingVec);
+    imgCropped = crop_roi_from_image(imgResized, args.ROI);
+    image = imgCropped;
   }
   else if (args.PreprocessMode == "BlurAndCanny") {
-      imgCropped = crop_roi_from_image(frame_orig, args.ROI);
-      cv::resize(imgCropped.clone(), imgResized, resizingVec);
-      image = imgResized;
+    imgCropped = crop_roi_from_image(frame_orig, args.ROI);
+    cv::resize(imgCropped.clone(), imgResized, resizingVec);
+    image = imgResized;
   }
 
   // Image enhancement:
@@ -95,6 +96,7 @@ decoder_res_t decode_frame_new(args_t args) {
 
       // Find bracelet marks:
       rotation_angle = find_possible_marks(possible_marks,
+                                           frame_gray,
                                            frame_thresh,
                                            args.MinPixelWidth,
                                            args.MaxPixelWidth,
@@ -106,6 +108,8 @@ decoder_res_t decode_frame_new(args_t args) {
                                            args.MaxPixelArea,
                                            args.MinExtent,
                                            args.MaxExtent,
+                                           args.MinTexture,
+                                           args.MaxTexture,
                                            args.MaxDrift,
                                            args.PerspectiveMode,
                                            args.FindContoursMode,
@@ -144,7 +148,7 @@ decoder_res_t decode_frame_new(args_t args) {
         }
         sweep_space++;
       
-        if (args.debugMode) {
+        if (true || args.debugMode) {
           char buffer[1000];
           sprintf(buffer, "MedianBlurKernel=%d, CannyThr=%d, code=%s", MedianBlurKernel, CannyThr, code.c_str());
           debug(buffer);
@@ -289,6 +293,8 @@ args_t load_default_args() {
   args.MaxPixelArea = 600;
   args.MinExtent = 0.4;
   args.MaxExtent = 0.9;
+  args.MinTexture = 0;
+  args.MaxTexture = 255;
   args.MaxDrift = 2.5;
   args.MarksRows = 3;
   args.MarksCols = 10;
@@ -324,6 +330,8 @@ void print_args(args_t args) {
   printf("args.MaxPixelArea = %d\n", args.MaxPixelArea);
   printf("args.MinExtent = %.1f\n", args.MinExtent);
   printf("args.MaxExtent = %.1f\n", args.MaxExtent);
+  printf("args.MinTexture = %.1f\n", args.MinTexture);
+  printf("args.MaxTexture = %.1f\n", args.MaxTexture);
   printf("args.MaxDrift = %.1f\n", args.MaxDrift);
   printf("args.MarksRows = %d\n", args.MarksRows);
   printf("args.MarksCols = %d\n", args.MarksCols);

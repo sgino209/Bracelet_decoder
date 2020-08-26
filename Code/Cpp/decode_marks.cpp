@@ -99,7 +99,9 @@ std::string decode_marks(mark_list_t marks_list, unsigned int MarksRows, unsigne
     }
   }
   else if (code_str[0] == code_str[N-1]) {
-    error("Invalid code detected! (first mark equals to last mark)");
+    if (debugMode) {
+      error("Invalid code detected! (first mark equals to last mark)");
+    }
   }
 
   // Bin to Hex:

@@ -57,6 +57,8 @@ typedef struct {
   unsigned int MaxPixelArea;
   double MinExtent;
   double MaxExtent;
+  double MinTexture;
+  double MaxTexture;
   double MaxDrift;
   unsigned int MarksRows;
   unsigned int MarksCols;
@@ -83,6 +85,7 @@ class PossibleMark;
 const cv::Size resizingVec1(1600,1200);
 const cv::Size resizingVec2(1200,1600);
 const cv::Size resizingVec3(1120,840);
+const cv::Size resizingVec4(1000,1000);
 
 // Common color values:
 const cv::Scalar SCALAR_BLACK = cv::Scalar(0.0, 0.0, 0.0);

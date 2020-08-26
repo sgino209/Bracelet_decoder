@@ -3,7 +3,7 @@
 
 #include "mainscan.hpp"
 
-const char* bracelet_decoder_version = "1.3";
+const char* bracelet_decoder_version = "1.4";
 
 int main(int argc, char** argv) {
   
@@ -50,6 +50,8 @@ int main(int argc, char** argv) {
       case ARG_MAXPIXELAREA:               if (optarg) { args.MaxPixelArea = atoi(optarg);                 } break;
       case ARG_MINEXTENT:                  if (optarg) { args.MinExtent = atof(optarg);                    } break;
       case ARG_MAXEXTENT:                  if (optarg) { args.MaxExtent = atof(optarg);                    } break;
+      case ARG_MINTEXTURE:                 if (optarg) { args.MinTexture = atof(optarg);                   } break;
+      case ARG_MAXTEXTURE:                 if (optarg) { args.MaxTexture = atof(optarg);                   } break;
       case ARG_MAXDRIFT:                   if (optarg) { args.MaxDrift = atof(optarg);                     } break;
       case ARG_MARKROWS:                   if (optarg) { args.MarksRows = atoi(optarg);                    } break;
       case ARG_MARKCOLS:                   if (optarg) { args.MarksCols = atoi(optarg);                    } break;
