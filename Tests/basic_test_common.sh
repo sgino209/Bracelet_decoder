@@ -11,9 +11,15 @@ bracelet_test() {
   res2=$(echo $res1 | grep -w $4)
   if [ "$res2" ]; then
     printf "$2\t PASSED!\n"
+    if [ -n "${pass}" ]; then ((pass++)); fi
   else
     printf "$2\t \033[1;31mFAILED\033[0m! ($res1) $5\n"
+    if [ -n "${fail}" ]; then ((fail++)); fi
   fi
+}
+
+passRate() {
+    printf "Pass=${pass}, Fail=${fail}, passRate=%.2f%%\n" $(echo 100*${pass}/\(${pass}+${fail}\) | bc -l)
 }
 
 hr() {

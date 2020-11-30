@@ -42,8 +42,8 @@ decoder_res_t decode_frame_new(args_t args) {
     }
   }
   else if (args.PreprocessMode == "BlurAndCanny") {
-    //resizingVec = resizingVec3;
-    resizingVec = resizingVec4;
+    resizingVec = resizingVec3;
+    //resizingVec = resizingVec4;
   }
   else {
       error("Unsupported PreprocessMode mode: " + args.PreprocessMode);
@@ -148,7 +148,7 @@ decoder_res_t decode_frame_new(args_t args) {
         }
         sweep_space++;
       
-        if (true || args.debugMode) {
+        if (args.debugMode) {
           char buffer[1000];
           sprintf(buffer, "MedianBlurKernel=%d, CannyThr=%d, code=%s", MedianBlurKernel, CannyThr, code.c_str());
           debug(buffer);
