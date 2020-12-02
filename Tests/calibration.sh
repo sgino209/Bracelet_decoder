@@ -137,16 +137,16 @@ tic
 Initialize "${exec_mode}"
                                      
 # RunTests <test_suite> <images_num> <preprocess_cvc> <preprocess_medianblurkernel> <preprocess_cannythr> <preprocess_houghparams_mindist> <preprocess_houghparams_param2> <preprocess_houghparams_minrad>
-RunTests "bg_0x37d476da" ${images_num} "V" "15,19" "90,130" "35,45" "11,13" "9,15"
-RunTests "bs_0x3b95ba4c" ${images_num} "V" "15,19" "90,130" "35,45" "11,13" "9,15"
-RunTests "bg_0x37d476da" ${images_num} "V" "15,19" "90,130" "35,45" "11,13" "9,15"
-RunTests "bs_0x3b95ba4c" ${images_num} "V" "15,19" "90,130" "35,45" "11,13" "9,15"
-RunTests "db_0x3e72676c" ${images_num} "V" "15,19" "90,130" "35,45" "11,13" "9,15"
-RunTests "dg_0x28395bda" ${images_num} "V" "15,19" "90,130" "35,45" "11,13" "9,15"
-RunTests "dr_0x2ad4be54" ${images_num} "V" "15,19" "90,130" "35,45" "11,13" "9,15"
-RunTests "ds_0x2612f31a" ${images_num} "V" "15,19" "90,130" "35,45" "11,13" "9,15"
-RunTests "ds_0x275effa2" ${images_num} "V" "15,19" "90,130" "35,45" "11,13" "9,15"
-RunTests "ds_0x33188fda" ${images_num} "V" "15,19" "90,130" "35,45" "11,13" "9,15"
+RunTests "bg_0x37d476da" ${images_num} "V" "3,19" "80,130" "35,45" "11,13" "9,15"
+RunTests "bs_0x3b95ba4c" ${images_num} "V" "3,19" "80,130" "35,45" "11,13" "9,15"
+RunTests "bg_0x37d476da" ${images_num} "V" "3,19" "80,130" "35,45" "11,13" "9,15"
+RunTests "bs_0x3b95ba4c" ${images_num} "V" "3,19" "80,130" "35,45" "11,13" "9,15"
+RunTests "db_0x3e72676c" ${images_num} "V" "3,19" "80,130" "35,45" "11,13" "9,15"
+RunTests "dg_0x28395bda" ${images_num} "V" "3,19" "80,130" "35,45" "11,13" "9,15"
+RunTests "dr_0x2ad4be54" ${images_num} "V" "3,19" "80,130" "35,45" "11,13" "9,15"
+RunTests "ds_0x2612f31a" ${images_num} "V" "3,19" "80,130" "35,45" "11,13" "9,15"
+RunTests "ds_0x275effa2" ${images_num} "V" "3,19" "80,130" "35,45" "11,13" "9,15"
+RunTests "ds_0x33188fda" ${images_num} "V" "3,19" "80,130" "35,45" "11,13" "9,15"
 
 echo "Completed Successfully"
 
